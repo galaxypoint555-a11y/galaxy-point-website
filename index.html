@@ -92,8 +92,8 @@
 .gp-drawer-close{position:absolute;top:15px;right:18px;border:0;background:transparent;font-size:29px;color:#30251d;cursor:pointer}
 body.gp-menu-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.menu-pop,.gp-drawer-backdrop{transition:none}}
-</style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
-<header class="nav"><button class="mobile-menu" id="menuBtn" aria-label="Menu">☰</button><div class="logo" data-page="home">GALAXY POINT<b>KHARGHAR</b></div><div class="navlinks"><button data-page="home">HOME</button><button data-page="shop">SHOP ALL</button><button data-cat="iPhone">IPHONE</button><button data-cat="Samsung">SAMSUNG</button><button data-page="track">TRACK ORDER</button><button data-page="support">CONTACT US</button></div><button class="bag" data-page="cart" aria-label="View shopping bag">♧ <span id="bagCount">0</span></button></header><div class="gp-drawer-backdrop" id="gpDrawerBackdrop"></div><nav class="menu-pop" id="menuPop" aria-label="Main menu"><button class="gp-drawer-close" id="gpDrawerClose" aria-label="Close menu">×</button><button data-page="home">HOME</button><button data-page="track">MY ORDER</button><button data-page="track">TRACK ORDER</button><button data-page="about">ABOUT STORE</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-page="support">CONTACT SERVICE CENTRE</button></nav>
+</style><style id="gp-header-video-polish">.nav .bag{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:5px;color:#fff;position:relative}.nav .bag svg{display:block;flex:none}.nav .bag span{position:absolute;top:-3px;right:-4px;min-width:18px;height:18px;display:grid;place-items:center;background:#b88c65;color:#fff;border:1px solid #32251e;border-radius:50%;font-size:10px;font-weight:700;padding:0 4px}.hero-play-fallback{display:none!important}.hero-video-layer video{pointer-events:none}@media(max-width:750px){.nav .bag{width:42px;height:42px}.nav .bag svg{width:27px;height:27px}}</style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
+<header class="nav"><button class="mobile-menu" id="menuBtn" aria-label="Menu">☰</button><div class="logo" data-page="home">GALAXY POINT<b>KHARGHAR</b></div><div class="navlinks"><button data-page="home">HOME</button><button data-page="shop">SHOP ALL</button><button data-cat="iPhone">IPHONE</button><button data-cat="Samsung">SAMSUNG</button><button data-page="track">TRACK ORDER</button><button data-page="support">CONTACT US</button></div><button class="bag" data-page="cart" aria-label="View shopping bag"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8.5h15l-1 12h-13l-1-12Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg> <span id="bagCount">0</span></button></header><div class="gp-drawer-backdrop" id="gpDrawerBackdrop"></div><nav class="menu-pop" id="menuPop" aria-label="Main menu"><button class="gp-drawer-close" id="gpDrawerClose" aria-label="Close menu">×</button><button data-page="home">HOME</button><button data-page="track">MY ORDER</button><button data-page="track">TRACK ORDER</button><button data-page="about">ABOUT STORE</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-page="support">CONTACT SERVICE CENTRE</button></nav>
 <main id="view"></main><button class="chat" id="chatBtn" aria-label="Store contact">☏</button>
 <script src="gp-config.js?v=20261110-mobile-live-2"></script><script>
 (function(){
@@ -120,7 +120,7 @@ function gpProductPage(){const p=items.find(x=>String(x.id)===String(gpSelectedP
 function gpAboutPage(){return '<section class="gp-support"><div class="eyebrow">ABOUT GALAXY POINT</div><h1>Our Store</h1><p>Galaxy Point Kharghar offers new and pre-owned smartphones, laptops, premium accessories and professional device repair services.</p><div class="gp-support-grid"><div><h2>Visit Our Store</h2><p>Shop No. 49, Tiara Mall, Sector 13, Kharghar, Navi Mumbai</p></div><div><h2>Our Services</h2><p>Buy · Sell · Exchange · Mobile & Laptop Repairing</p></div></div></section>'}
 function gpSupportPage(){return '<section class="gp-support"><div class="eyebrow">WE ARE HERE TO HELP</div><h1>Contact Galaxy Point</h1><p>Shop No. 49, Tiara Mall, Sector 13, Kharghar, Navi Mumbai</p><div class="gp-support-grid">'+[['Sales Enquiries','New and pre-owned phones, laptops and accessories'],['Customer Support','Product questions and assistance'],['Repairing & Service Centre','Mobile, laptop and chip-level repair enquiries'],['Order Support','Order and delivery assistance']].map(x=>'<div><h2>'+x[0]+'</h2><p>'+x[1]+'</p><span>Contact number to be configured</span></div>').join('')+'</div></section>'}
 
-function home(){const gp=window.gpPublishedSettings||{};const gpEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));return '<section class="hero"><div class="hero-video-layer">'+photo(3)+'<video id="gpStoreVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-label="Galaxy Point iPhone 17 Pro Max original video"></video><button id="gpTapToPlay" class="hero-play-fallback" type="button">▶ Tap to Play Video</button></div><div class="hero-shade"></div><div class="shop-video-note">GALAXY POINT • IPHONE 17 PRO MAX</div><div class="hero-caption"><div class="overline">'+gpEsc(gp.hero?.kicker||gp.hero_label||"WELCOME TO OUR STORE")+'</div><h1>'+gpEsc(gp.hero?.title||gp.hero_title||"Discover your next upgrade.")+'</h1><p>'+gpEsc(gp.hero?.subtitle||"Premium mobile phones, laptops and trusted service.")+'</p><button class="outline-btn" data-page="shop">'+gpEsc(gp.hero?.cta||"EXPLORE COLLECTION")+' →</button></div></section>'+
+function home(){const gp=window.gpPublishedSettings||{};const gpEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));return '<section class="hero"><div class="hero-video-layer">'+photo(3)+'<video id="gpStoreVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-label="Galaxy Point iPhone 17 Pro Max original video"></video></div><div class="hero-shade"></div><div class="shop-video-note">GALAXY POINT • IPHONE 17 PRO MAX</div><div class="hero-caption"><div class="overline">'+gpEsc(gp.hero?.kicker||gp.hero_label||"WELCOME TO OUR STORE")+'</div><h1>'+gpEsc(gp.hero?.title||gp.hero_title||"Discover your next upgrade.")+'</h1><p>'+gpEsc(gp.hero?.subtitle||"Premium mobile phones, laptops and trusted service.")+'</p><button class="outline-btn" data-page="shop">'+gpEsc(gp.hero?.cta||"EXPLORE COLLECTION")+' →</button></div></section>'+
 '<section class="section intro gp-round-section reveal"><div class="eyebrow">EXPLORE THE COLLECTION</div><h2>Shop by Category</h2><p>Every product photo is paired with the correct device model.</p><div class="round-rail">'+[["iPhone",2],["Samsung",4],["Laptops",5]].map(x=>'<div class="round-item" data-cat="'+x[0]+'"><div class="round-image">'+'<img src="'+categoryImages[x[0]]+'" alt="'+x[0]+'" loading="lazy">'+'</div><span>'+x[0]+'</span></div>').join('')+'</div></section>'+
 '<div class="marquee"><div class="marquee-track"><span>GALAXY POINT ✦ BUY ✦ SELL ✦ EXCHANGE ✦ REPAIRS ✦ KHARGHAR ✦</span><span>GALAXY POINT ✦ BUY ✦ SELL ✦ EXCHANGE ✦ REPAIRS ✦ KHARGHAR ✦</span></div></div>'+
 '<section class="section intro section-products reveal"><div class="eyebrow">OUR MOBILE COLLECTION</div><h2>Browse our devices</h2><p>Product photos from Galaxy Point promotional creatives. Verify availability before ordering.</p><div class="chips">'+["All","iPhone","Samsung","Laptops"].map(c=>'<button class="'+(cat===c?"on":"")+'" data-cat="'+c+'">'+c+'</button>').join("")+'</div>'+cards()+'</section>'+
@@ -142,7 +142,7 @@ function setupStoreVideo(){
  if(window.gpRunningHls && typeof window.gpRunningHls.destroy==="function"){window.gpRunningHls.destroy();window.gpRunningHls=null;}
  const v=document.getElementById("gpStoreVideo");
  if(!v)return;
- const hero=v.closest(".hero"),tap=document.getElementById("gpTapToPlay");
+ const hero=v.closest(".hero");
  const configuredVideo=window.gpPublishedSettings?.hero_video_url;
  const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"galaxy-point-home-hls/index.m3u8";
  const directVideo=/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source);
@@ -151,11 +151,11 @@ function setupStoreVideo(){
  const playback=()=>{
    if(!v.isConnected)return;
    const result=v.play();
-   if(result&&typeof result.catch==="function")result.catch(()=>{if(v.isConnected)tap.classList.add("visible")});
+   if(result&&typeof result.catch==="function")result.catch(()=>{ /* Autoplay may be restricted by the browser; retain poster without intrusive overlay. */ });
  };
- v.addEventListener("playing",()=>{hero.classList.add("video-ready");tap.classList.remove("visible")});
- v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)tap.classList.add("visible")});
- tap.addEventListener("click",()=>{tap.classList.remove("visible");playback()});
+ v.addEventListener("playing",()=>{hero.classList.add("video-ready")});
+ v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)playback()});
+ 
  if(directVideo){v.src=source;v.load();playback();}
  else if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
    v.src=source;v.load();playback();
@@ -170,15 +170,15 @@ function setupStoreVideo(){
          if(!data||!data.fatal)return;
          if(data.type===window.Hls.ErrorTypes.NETWORK_ERROR)h.startLoad();
          else if(data.type===window.Hls.ErrorTypes.MEDIA_ERROR)h.recoverMediaError();
-         else tap.classList.add("visible");
+         else { /* Keep hero poster visible on playback failure. */ }
        });
-     }else{tap.textContent="Video not supported in this browser";tap.classList.add("visible")}
+     }else{ /* HLS not supported; keep hero image. */ }
    };
    if(window.Hls)startHls();else{
      const script=document.createElement("script");
      script.src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
      script.async=true;script.onload=startHls;
-     script.onerror=()=>{if(v.isConnected){tap.textContent="Video player unavailable";tap.classList.add("visible")}};
+     script.onerror=()=>{ /* Keep hero image if player library is unavailable. */ };
      document.head.appendChild(script);
    }
  }
