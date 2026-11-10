@@ -106,7 +106,7 @@ body.gp-menu-open{overflow:hidden}
 .gp-wish-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:13px;background:#30231b;color:white;border:0;padding:17px 12px;margin-top:17px;font-size:11px;font-weight:700;letter-spacing:1.5px;cursor:pointer}.gp-wish-submit span{font-size:20px;font-weight:400}.gp-wish-submit:hover{background:#563c2a}
 .gp-wish-error{color:#a33e38;font-size:12px;min-height:0;margin:7px 0 0}.gp-wish-privacy{border-top:1px solid #e8ded3;margin-top:23px;padding-top:17px;font-size:11px;color:#8b7d70;line-height:1.5}
 @media(max-width:540px){.gp-wish-overlay{align-items:center;padding:12px}.gp-wish-dialog{padding:30px 23px 23px}.gp-wish-dialog h2{font-size:34px}.gp-wish-sub{font-size:12px;margin-bottom:19px}.gp-wish-dialog input{padding:13px 12px}}
-</style><style id="gp-no-old-video-flash">.hero-video-layer{background:#28211c}.hero-video-layer video{background:#28211c}.hero:not(.video-ready) .hero-video-layer{background:linear-gradient(135deg,#29211c,#49392d)}.hero:not(.video-ready) .hero-caption{opacity:1;pointer-events:auto}.hero.video-ready .hero-caption{opacity:1}</style><style id="gp-story-video-v1">.gp-story-video-art{position:relative;overflow:hidden;background:linear-gradient(145deg,#251d18,#6b5340);min-height:420px}.gp-story-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:2;opacity:0;transition:opacity .4s}.gp-story-playing .gp-story-video{opacity:1}.gp-story-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#f6e8d6;text-align:center;padding:24px}.gp-story-placeholder span{font-size:10px;letter-spacing:3px}.gp-story-placeholder strong{font:normal clamp(30px,4vw,50px)/1.2 Georgia,serif;max-width:400px}@media(max-width:750px){.gp-story-video-art{min-height:480px}.gp-story-video{object-position:center}}</style><style id="gp-hero-visibility-repair">.hero{background:linear-gradient(135deg,#29211c,#594330)!important;min-height:520px}.hero .hero-caption{opacity:1!important;visibility:visible!important}.hero .hero-video-layer{background:linear-gradient(135deg,#29211c,#594330)}.hero .hero-video-layer video{background:transparent}.hero .hero-shade{background:linear-gradient(180deg,#1d100e33 0%,#1d100e44 40%,#1d100edc 100%)}.hero.gp-video-unavailable .hero-caption{display:block!important}</style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
+</style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
 <header class="nav"><button class="mobile-menu" id="menuBtn" aria-label="Menu">☰</button><div class="logo" data-page="home">GALAXY POINT<b>KHARGHAR</b></div><div class="navlinks"><button data-page="home">HOME</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-cat="Pre-Owned">PRE-OWNED</button><button data-cat="New Phone">NEW PHONE</button><button data-page="track">TRACK ORDER</button><button data-page="support">CONTACT US</button></div><button class="bag" data-page="cart" aria-label="View shopping bag"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8.5h15l-1 12h-13l-1-12Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg> <span id="bagCount">0</span></button></header><div class="gp-drawer-backdrop" id="gpDrawerBackdrop"></div><nav class="menu-pop" id="menuPop" aria-label="Main menu"><button class="gp-drawer-close" id="gpDrawerClose" aria-label="Close menu">×</button><button data-page="home">HOME</button><button data-page="wishlist">WISHLIST ♡</button><button data-page="track">MY ORDER</button><button data-page="track">TRACK ORDER</button><button data-page="about">ABOUT STORE</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-page="support">CONTACT SERVICE CENTRE</button></nav>
 <main id="view"></main><button class="chat" id="chatBtn" aria-label="Store contact">☏</button>
 <script src="gp-config.js?v=20261110-mobile-live-2"></script><script>
@@ -179,14 +179,14 @@ function gpProductPage(){const p=items.find(x=>String(x.id)===String(gpSelectedP
 function gpAboutPage(){return '<section class="gp-support"><div class="eyebrow">ABOUT GALAXY POINT</div><h1>Our Store</h1><p>Galaxy Point Kharghar offers new and pre-owned smartphones, laptops, premium accessories and professional device repair services.</p><div class="gp-support-grid"><div><h2>Visit Our Store</h2><p>Shop No. 49, Tiara Mall, Sector 13, Kharghar, Navi Mumbai</p></div><div><h2>Our Services</h2><p>Buy · Sell · Exchange · Mobile & Laptop Repairing</p></div></div></section>'}
 function gpSupportPage(){return '<section class="gp-support"><div class="eyebrow">WE ARE HERE TO HELP</div><h1>Contact Galaxy Point</h1><p>Shop No. 49, Tiara Mall, Sector 13, Kharghar, Navi Mumbai</p><div class="gp-support-grid">'+[['Sales Enquiries','New and pre-owned phones, laptops and accessories'],['Customer Support','Product questions and assistance'],['Repairing & Service Centre','Mobile, laptop and chip-level repair enquiries'],['Order Support','Order and delivery assistance']].map(x=>'<div><h2>'+x[0]+'</h2><p>'+x[1]+'</p><span>Contact number to be configured</span></div>').join('')+'</div></section>'}
 
-function home(){const gp=window.gpPublishedSettings||{};const gpEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));return '<section class="hero"><div class="hero-video-layer"><video id="gpStoreVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-label="Galaxy Point latest store video"></video></div><div class="hero-shade"></div><div class="shop-video-note">GALAXY POINT • KHARGHAR</div><div class="hero-caption"><div class="overline">'+gpEsc(gp.hero?.kicker||gp.hero_label||"WELCOME TO OUR STORE")+'</div><h1>'+gpEsc(gp.hero?.title||gp.hero_title||"Discover your next upgrade.")+'</h1><p>'+gpEsc(gp.hero?.subtitle||"Premium mobile phones, laptops and trusted service.")+'</p><button class="outline-btn" data-page="shop">'+gpEsc(gp.hero?.cta||"EXPLORE COLLECTION")+' →</button></div></section>'+
+function home(){const gp=window.gpPublishedSettings||{};const gpEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));return '<section class="hero"><div class="hero-video-layer">'+photo(3)+'<video id="gpStoreVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-label="Galaxy Point iPhone 17 Pro Max original video"></video></div><div class="hero-shade"></div><div class="shop-video-note">GALAXY POINT • IPHONE 17 PRO MAX</div><div class="hero-caption"><div class="overline">'+gpEsc(gp.hero?.kicker||gp.hero_label||"WELCOME TO OUR STORE")+'</div><h1>'+gpEsc(gp.hero?.title||gp.hero_title||"Discover your next upgrade.")+'</h1><p>'+gpEsc(gp.hero?.subtitle||"Premium mobile phones, laptops and trusted service.")+'</p><button class="outline-btn" data-page="shop">'+gpEsc(gp.hero?.cta||"EXPLORE COLLECTION")+' →</button></div></section>'+
 '<section class="section intro gp-round-section reveal"><div class="eyebrow">EXPLORE THE COLLECTION</div><h2>Shop by Category</h2><p>Every product photo is paired with the correct device model.</p><div class="round-rail">'+[["iPhone",2],["Samsung",4],["Laptops",5]].map(x=>'<div class="round-item" data-cat="'+x[0]+'"><div class="round-image">'+'<img src="'+categoryImages[x[0]]+'" alt="'+x[0]+'" loading="lazy">'+'</div><span>'+x[0]+'</span></div>').join('')+'</div></section>'+
 '<div class="marquee"><div class="marquee-track"><span>GALAXY POINT ✦ BUY ✦ SELL ✦ EXCHANGE ✦ REPAIRS ✦ KHARGHAR ✦</span><span>GALAXY POINT ✦ BUY ✦ SELL ✦ EXCHANGE ✦ REPAIRS ✦ KHARGHAR ✦</span></div></div>'+
 '<section class="section intro section-products reveal"><div class="eyebrow">OUR MOBILE COLLECTION</div><h2>Browse our devices</h2><p>Product photos from Galaxy Point promotional creatives. Verify availability before ordering.</p><div class="chips">'+["All","iPhone","Samsung","Laptops"].map(c=>'<button class="'+(cat===c?"on":"")+'" data-cat="'+c+'">'+c+'</button>').join("")+'</div>'+cards()+'</section>'+
 '<section class="feature-split reveal"><div class="feature-photo">'+photo(2)+'</div><div class="feature-copy"><span class="eyebrow">IPHONE COLLECTION</span><h2>Upgrade to Pro.</h2><p>Find your next iPhone at Galaxy Point Kharghar. Buy, sell and exchange with our in-store team.</p><button class="outlined-dark" data-cat="iPhone">EXPLORE IPHONES</button></div></section>'+
 '<section class="section intro collection-section reveal"><span class="eyebrow">EXPLORE THE COLLECTIONS</span><h2>Handpicked for you</h2><div class="collection-rail">'+[["iPhone Pro Max",2,"iPhone"],["Samsung Fold",3,"Samsung"],["MacBook Neo",5,"Laptops"]].map(x=>'<div class="collection-card" data-cat="'+x[2]+'">'+photo(x[1])+'<div class="collection-label">'+x[0]+' <span>SHOP NOW →</span></div></div>').join('')+'</div></section>'+
 '<section class="section intro reveal"><div class="eyebrow">CUSTOMER FAVOURITES</div><h2>Featured Devices</h2><div class="feature-rail">'+items.map(p=>'<div class="rail-card"><div class="rail-photo">'+photo(p)+'</div><h3>'+p.name+'</h3><div>'+money(p.price)+'</div><button data-add="'+p.id+'">ADD TO BAG +</button></div>').join('')+'</div></section>'+
-'<section class="story reveal gp-story-video-section"><div class="story-art story-photograph gp-story-video-art"><video class="gp-story-video" src="galaxy-point-customer-journey.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Inside Galaxy Point Kharghar — customer experiences and mobile deals" onplaying="this.parentElement.classList.add('gp-story-playing')" onerror="this.parentElement.classList.remove('gp-story-playing')"></video><div class="gp-story-placeholder"><span>GALAXY POINT · KHARGHAR</span><strong>Every customer has a story.</strong></div></div><div class="story-copy"><div class="eyebrow">THE GALAXY POINT EXPERIENCE</div><h2>Every Customer. Every Deal. Every Smile.</h2><p>Step inside Galaxy Point, Kharghar — where every visit brings a new story, exciting smartphone deals and genuine customer connections. From finding the right device to celebrating the perfect purchase, we're here to make every experience memorable.</p><button data-page="shop">EXPLORE OUR COLLECTION</button></div></section>'+
+'<section class="story reveal"><div class="story-art story-photograph">'+photo(6)+'</div><div class="story-copy"><div class="eyebrow">TRUSTED IN KHARGHAR</div><h2>More Than Just a Mobile Store.</h2><p>Buy, sell, exchange and repair your devices with Galaxy Point. Visit our Kharghar store for the latest offers and exact stock availability.</p><button data-page="shop">EXPLORE COLLECTION</button></div></section>'+
 '<section class="section intro reveal" style="background:#f6f0e9"><span class="eyebrow">VISIT OUR STORE</span><h2>Customers come for the deal,<br>stay for the trust.</h2><p>Shop No. 49, Tiara Mall, Sector 13, Kharghar, Navi Mumbai</p></section>'}
 function shop(){return '<section class="section intro"><div class="eyebrow">GALAXY POINT STORE</div><h2>Shop Our Collection</h2><p>iPhone, Samsung, Android & more.</p></section>'+catalog()}
 function cart(){const arr=items.filter(x=>bag[x.id]);return '<div class="page"><div class="eyebrow">YOUR SELECTION</div><h1>Shopping Bag</h1>'+(arr.length?arr.map(p=>'<div class="line"><div><strong>'+p.name+'</strong><small>'+p.details+' • '+money(p.price)+'</small></div><div class="quantity"><button data-dec="'+p.id+'">−</button><span>'+bag[p.id]+'</span><button data-add="'+p.id+'">+</button></div></div>').join("")+'<div class="total"><span>Subtotal</span><span>'+money(sum())+'</span></div><div class="callout">Preview only — checkout does not place a real Galaxy Point order. Product details and availability to be confirmed.</div><button class="primary" data-page="checkout">CONTINUE TO CHECKOUT →</button>':'<div class="empty">Your shopping bag is empty.<p><button class="primary" data-page="shop">SHOP NOW</button></p></div>')+'</div>'}
@@ -198,20 +198,77 @@ function show(){document.getElementById("bagCount").textContent=count();v.innerH
 function setupReveals(){const nodes=[...document.querySelectorAll(".reveal")];if(!("IntersectionObserver" in window)){nodes.forEach(n=>n.classList.add("in-view"));return}const observer=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target)}})},{threshold:.06,rootMargin:"0px 0px 25px 0px"});nodes.forEach(n=>observer.observe(n))}
 
 function setupStoreVideo(){
- if(window.gpRunningHls&&typeof window.gpRunningHls.destroy==='function'){window.gpRunningHls.destroy();window.gpRunningHls=null;}
- const v=document.getElementById('gpStoreVideo');if(!v||!window.gpVideoSettingsLoaded)return;
- const source=window.gpPublishedSettings?.hero_video_url;
- // Never play the old sample HLS or older local playlist while loading the current staff-uploaded video.
- if(typeof source!=='string'||!/^https:\/\//i.test(source)){v.closest('.hero')?.classList.add('gp-video-unavailable');return;}
- const hero=v.closest('.hero');
+ if(window.gpRunningHls && typeof window.gpRunningHls.destroy==="function"){window.gpRunningHls.destroy();window.gpRunningHls=null;}
+ const v=document.getElementById("gpStoreVideo");
+ if(!v)return;
+ const hero=v.closest(".hero");
+ if(!window.gpVideoSettingsLoaded)return;
+ const gpPlaylist=["gp-happy-diwali.mp4","gp-new-stock.mp4"];
+ const gpStartPlaylist=async()=>{
+   const available=await Promise.all(gpPlaylist.map(async url=>{try{const response=await fetch(url,{method:"HEAD",cache:"no-store"});return response.ok}catch{return false}}));
+   if(!v.isConnected||!available.every(Boolean))return false;
+   if(window.gpRunningHls&&typeof window.gpRunningHls.destroy==="function"){window.gpRunningHls.destroy();window.gpRunningHls=null}
+   let index=0;
+   v.loop=false;v.muted=true;v.defaultMuted=true;v.playsInline=true;
+   v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("autoplay","");
+   v.removeAttribute("loop");
+   const next=()=>{if(!v.isConnected)return;v.src=gpPlaylist[index];v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{})};
+   v.addEventListener("ended",()=>{index=(index+1)%gpPlaylist.length;next()});
+   v.addEventListener("playing",()=>hero.classList.add("video-ready"));
+   document.addEventListener("visibilitychange",()=>{if(!document.hidden&&v.isConnected&&v.paused){const p=v.play();if(p&&p.catch)p.catch(()=>{})}});
+   next();return true;
+ };
+ const playlistReady=gpStartPlaylist();
+ const configuredVideo=window.gpPublishedSettings?.hero_video_url;
+ const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"";
+ const directVideo=/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source);
  v.muted=true;v.defaultMuted=true;v.autoplay=true;v.playsInline=true;v.loop=true;
- v.setAttribute('muted','');v.setAttribute('playsinline','');v.setAttribute('autoplay','');
- v.addEventListener('playing',()=>{if(v.isConnected)hero.classList.add('video-ready')});
- const play=()=>{if(!v.isConnected)return;const p=v.play();if(p&&p.catch)p.catch(()=>{})};
- if(/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source)){v.src=source;v.load();play();return;}
- if(v.canPlayType('application/vnd.apple.mpegurl')||v.canPlayType('application/x-mpegURL')){v.src=source;v.load();play();return;}
- const startHls=()=>{if(!v.isConnected||!window.Hls?.isSupported())return;const h=new window.Hls({enableWorker:true,startLevel:-1,maxBufferLength:20});window.gpRunningHls=h;h.loadSource(source);h.attachMedia(v);h.on(window.Hls.Events.MANIFEST_PARSED,play)};
- if(window.Hls)startHls();else{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js';script.async=true;script.onload=startHls;document.head.appendChild(script);}
+ v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.setAttribute("autoplay","");
+ const playback=()=>{
+   if(!v.isConnected)return;
+   const result=v.play();
+   if(result&&typeof result.catch==="function")result.catch(()=>{ /* Autoplay may be restricted by the browser; retain poster without intrusive overlay. */ });
+ };
+ v.addEventListener("playing",()=>{hero.classList.add("video-ready")});
+ v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)playback()});
+ 
+ playlistReady.then(ready=>{if(ready||!source)return;
+ if(directVideo){v.src=source;v.load();playback();}
+ else if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
+   v.src=source;v.load();playback();
+ } else {
+   const startHls=()=>{
+     if(!v.isConnected)return;
+     if(window.Hls&&window.Hls.isSupported()){
+       const h=new window.Hls({enableWorker:true,startLevel:-1,lowLatencyMode:false,maxBufferLength:20});
+       window.gpRunningHls=h;h.loadSource(source);h.attachMedia(v);
+       h.on(window.Hls.Events.MANIFEST_PARSED,playback);
+       h.on(window.Hls.Events.ERROR,(_,data)=>{
+         if(!data||!data.fatal)return;
+         if(data.type===window.Hls.ErrorTypes.NETWORK_ERROR)h.startLoad();
+         else if(data.type===window.Hls.ErrorTypes.MEDIA_ERROR)h.recoverMediaError();
+         else { /* Keep hero poster visible on playback failure. */ }
+       });
+     }else{ /* HLS not supported; keep hero image. */ }
+   };
+   if(window.Hls)startHls();else{
+     const script=document.createElement("script");
+     script.src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
+     script.async=true;script.onload=startHls;
+     script.onerror=()=>{ /* Keep hero image if player library is unavailable. */ };
+     document.head.appendChild(script);
+   }
+ }
+ });
+ if(!window.gpVideoVisibilityBound){
+   window.gpVideoVisibilityBound=true;
+   document.addEventListener("visibilitychange",()=>{
+     if(!document.hidden){
+       const active=document.getElementById("gpStoreVideo");
+       if(active&&active.paused){const p=active.play();if(p&&p.catch)p.catch(()=>{})}
+     }
+   });
+ }
 }
 setInterval(()=>{const slides=[...document.querySelectorAll(".hero-slide")],dots=[...document.querySelectorAll(".hero-dots span")];if(slides.length<2)return;const active=slides.findIndex(s=>s.classList.contains("active"));slides.forEach((s,i)=>s.classList.toggle("active",i===(active+1)%slides.length));dots.forEach((s,i)=>s.classList.toggle("active",i===(active+1)%dots.length))},4700);
 
