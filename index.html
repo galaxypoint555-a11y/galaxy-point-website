@@ -124,7 +124,9 @@ function setupStoreVideo(){
  const v=document.getElementById("gpStoreVideo");
  if(!v)return;
  const hero=v.closest(".hero"),tap=document.getElementById("gpTapToPlay");
- const source="galaxy-point-home-hls/index.m3u8";
+ const configuredVideo=window.gpPublishedSettings?.hero_video_url;
+ const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"galaxy-point-home-hls/index.m3u8";
+ const directVideo=/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source);
  v.muted=true;v.defaultMuted=true;v.autoplay=true;v.playsInline=true;v.loop=true;
  v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.setAttribute("autoplay","");
  const playback=()=>{
@@ -135,7 +137,8 @@ function setupStoreVideo(){
  v.addEventListener("playing",()=>{hero.classList.add("video-ready");tap.classList.remove("visible")});
  v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)tap.classList.add("visible")});
  tap.addEventListener("click",()=>{tap.classList.remove("visible");playback()});
- if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
+ if(directVideo){v.src=source;v.load();playback();}
+ else if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
    v.src=source;v.load();playback();
  } else {
    const startHls=()=>{
