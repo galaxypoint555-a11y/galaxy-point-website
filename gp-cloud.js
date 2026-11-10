@@ -25,7 +25,7 @@ window.GPCloud=(()=>{
     }
     try{
       user=await request('/auth/v1/user');
-      const rows=await request('/rest/v1/admin_users?select=user_id,role&user_id=eq.'+q(user.id));
+      const rows=await request('/rest/v1/staff_profiles?select=user_id,role&user_id=eq.'+q(user.id));
       if(!Array.isArray(rows)||!rows.length)throw Error('Your account does not have Galaxy Point staff access.');
       role=rows[0].role;return {user,role};
     }catch(e){saveSession(null);user=null;role=null;throw e;}
@@ -42,15 +42,15 @@ window.GPCloud=(()=>{
   }
   function active(){return Boolean(session?.access_token&&user&&role);}
   function guard(){if(!active())throw Error('Sign in with an authorized staff account first.');}
-  async function products(){guard();return await request('/rest/v1/products?select=*&order=created_at.desc&limit=500');}
-  async function settings(){guard();const a=await request('/rest/v1/site_settings?select=*&id=eq.1');return a[0]||{};}
-  async function saveSettings(fields){guard();return request('/rest/v1/site_settings?id=eq.1',{method:'PATCH',body:fields,extra:{Prefer:'return=minimal'}});}
-  async function upsertProduct(fields,id){guard();return id
-     ?request('/rest/v1/products?id=eq.'+q(id),{method:'PATCH',body:fields,extra:{Prefer:'return=minimal'}})
-     :request('/rest/v1/products',{method:'POST',body:fields,extra:{Prefer:'return=minimal'}});}
+  async function products(){guard();const rows=await request('/rest/v1/products?select=*&order=created_at.desc&limit=500');return rows.map(p=>({...p,title:p.name,brand:p.category,price_inr:p.price,active:p.is_published,condition:'Pre-owned'}));}
+  async function settings(){guard();const rows=await request('/rest/v1/website_settings?select=key,value');return Object.fromEntries(rows.map(x=>[x.key,x.value]));}
+  async function saveSettings(fields){guard();return request('/rest/v1/website_settings?on_conflict=key',{method:'POST',body:Object.entries(fields).map(([key,value])=>({key,value})),extra:{Prefer:'resolution=merge-duplicates,return=minimal'}});}
+  async function upsertProduct(fields,id){guard();const data={name:fields.title,category:fields.category,variant:fields.variant,description:fields.description,price:fields.price_inr,stock:fields.stock,image_url:fields.image_url,is_published:fields.active};return id
+     ?request('/rest/v1/products?id=eq.'+q(id),{method:'PATCH',body:data,extra:{Prefer:'return=minimal'}})
+     :request('/rest/v1/products',{method:'POST',body:data,extra:{Prefer:'return=minimal'}});}
   async function removeProduct(id){guard();return request('/rest/v1/products?id=eq.'+q(id),{method:'DELETE',extra:{Prefer:'return=minimal'}});}
-  async function orders(){guard();return request('/rest/v1/orders?select=*,order_items(*)&payment_status=eq.paid&order=created_at.desc&limit=500');}
-  async function updateOrderStatus(id,status){guard();return request('/rest/v1/orders?id=eq.'+q(id),{method:'PATCH',body:{status},extra:{Prefer:'return=minimal'}});}
+  async function orders(){guard();return request('/rest/v1/orders?select=*,order_items(*)&payment_status=eq.Paid&order=created_at.desc&limit=500');}
+  async function updateOrderStatus(id,status){guard();return request('/rest/v1/orders?id=eq.'+q(id),{method:'PATCH',body:{fulfillment_status:status},extra:{Prefer:'return=minimal'}});}
   async function upload(file,folder='catalog'){
     guard();if(!file||!file.size)throw Error('Choose an image or video first.');
     if(!['image/jpeg','image/png','image/webp','video/mp4','video/webm'].includes(file.type))throw Error('Upload JPG, PNG, WebP, MP4 or WebM only.');
