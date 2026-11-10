@@ -95,7 +95,7 @@ function login(){
    if(!res.ok||!data.access_token)throw Error(data.error_description||data.msg||data.error||'Email or password is incorrect.');
    token=data.access_token;error.textContent='Login successful. Checking dashboard access…';
    const staff=await Promise.race([api('staff_profiles?select=role&user_id=eq.'+encodeURIComponent(data.user.id)),new Promise((_,reject)=>setTimeout(()=>reject(Error('Permission check timed out. Please try again.')),12000))]);
-   if(!staff.length||!['boss','manager'].includes(staff[0].role))throw Error('This account is not assigned Boss or Manager access. Ask the administrator to add it to staff_profiles.');
+   if(!staff.length||staff[0].role!=='boss')throw Error('Boss-only access required. This account does not have the boss role.');
    error.textContent='Access approved. Loading dashboard…';
    await load();
   }catch(err){
