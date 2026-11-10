@@ -230,7 +230,7 @@ show();
 async function gpLoadPublishedCatalog(){
  try{
   const cfg=window.GP_CONFIG;
-  if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey){console.warn('Live catalog config missing');items=[];show();return;}
+  if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey){console.warn('Live catalog config missing');if(!window.gpCatalogSignature){items=[];show();}return;}
   const base=cfg.supabaseUrl.replace(/\/$/,'');
   const headers={apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey};
   const response=await fetch(base+'/rest/v1/products?select=id,title,brand,category,variant,description,price_inr,stock,image_url,is_published,active&is_published=eq.true&order=created_at.desc&limit=500',{headers,cache:'no-store'});
@@ -238,9 +238,10 @@ async function gpLoadPublishedCatalog(){
   const rows=await response.json();
   if(!Array.isArray(rows))throw Error('Invalid catalog');
   // Display only real, published inventory from Supabase; never silently fall back to sample products.
-  items=rows.map((p,i)=>({id:p.id,name:p.title,brand:p.brand||p.category,category:p.category,details:[p.variant,p.description].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
-  show();
- }catch(err){console.warn('Galaxy Point catalog sync unavailable; hiding outdated sample products.',err);items=[];show();}
+  const nextItems=rows.map((p,i)=>({id:p.id,name:p.title,brand:p.brand||p.category,category:p.category,details:[p.variant,p.description].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
+  const nextSignature=JSON.stringify(nextItems);
+  if(nextSignature!==window.gpCatalogSignature){window.gpCatalogSignature=nextSignature;items=nextItems;show();}
+ }catch(err){console.warn('Galaxy Point catalog sync unavailable; hiding outdated sample products.',err);if(!window.gpCatalogSignature){items=[];show();}}
 }
 gpLoadPublishedCatalog();
 
@@ -251,6 +252,9 @@ async function gpLoadSiteSettings(){
   const response=await fetch(base+'/rest/v1/website_settings?select=key,value',{headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey},cache:'no-store'});
   if(!response.ok)throw Error('Settings unavailable: '+response.status);
   const settings=Object.fromEntries((await response.json()).map(x=>[x.key,x.value]));
+  const settingsSignature=JSON.stringify(settings);
+  const settingsChanged=settingsSignature!==window.gpSettingsSignature;
+  window.gpSettingsSignature=settingsSignature;
   window.gpPublishedSettings=settings;
   if(settings.category_images&&typeof settings.category_images==='object'){
    for(const name of ['iPhone','Samsung','Laptops']){
@@ -258,7 +262,7 @@ async function gpLoadSiteSettings(){
     if(typeof url==='string'&&/^https:\/\//.test(url))categoryImages[name]=url;
    }
   }
-  if(page==='home')show();
+  if(page==='home'&&settingsChanged)show();
  }catch(err){console.warn('Galaxy Point site settings unavailable',err)}
 }
 gpLoadSiteSettings();
