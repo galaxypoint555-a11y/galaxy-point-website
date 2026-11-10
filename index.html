@@ -218,6 +218,18 @@ async function gpLoadSiteSettings(){
  }catch(err){console.warn('Galaxy Point site settings unavailable',err)}
 }
 gpLoadSiteSettings();
+// Fast cloud sync: refresh when customers return to the tab and while it stays open.
+// Avoid refreshing during checkout to preserve in-progress form data.
+let gpLastSync=Date.now();
+async function gpRefreshLive(){
+ if(document.hidden||page==='checkout'||page==='cart')return;
+ if(Date.now()-gpLastSync<1800)return;
+ gpLastSync=Date.now();
+ await Promise.allSettled([gpLoadSiteSettings(),gpLoadPublishedCatalog()]);
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)gpRefreshLive()});
+window.addEventListener('focus',gpRefreshLive);
+setInterval(gpRefreshLive,8000);
 
 })();
 </script></body></html>
