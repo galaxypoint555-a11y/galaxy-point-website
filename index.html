@@ -117,17 +117,17 @@ const gpWishContactKey='gpWishContact';
 async function gpWishlistLead(id,contact,action){
  const p=items.find(x=>String(x.id)===String(id));if(!p)throw Error('Product unavailable');
  const cfg=window.GP_CONFIG;if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey)throw Error('Wishlist service unavailable');
- const base=cfg.supabaseUrl.replace(/\\/$/,'');
+ const base=cfg.supabaseUrl.replace(/\/$/,'');
  const res=await fetch(base+'/rest/v1/wishlist_leads',{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({customer_name:contact.name,phone:contact.phone,product_id:String(p.id),product_name:p.name,action})});
  if(!res.ok)throw Error('Could not save wishlist to Galaxy Point. Please try again.');
 }
 async function gpWishAdd(id){
  let contact;try{contact=JSON.parse(localStorage.getItem(gpWishContactKey)||'null')}catch{}
- if(!contact?.name||!/^\\d{10}$/.test(contact.phone||'')){
+ if(!contact?.name||!/^\d{10}$/.test(contact.phone||'')){
   const name=prompt('Galaxy Point Wishlist — Please enter your full name');if(name===null)return false;
   if(name.trim().length<2){alert('Please enter your name (at least 2 characters).');return false;}
   const phone=prompt('Enter your 10-digit mobile number');if(phone===null)return false;
-  if(!/^\\d{10}$/.test(phone.trim())){alert('Please enter a valid 10-digit mobile number.');return false;}
+  if(!/^\d{10}$/.test(phone.trim())){alert('Please enter a valid 10-digit mobile number.');return false;}
   contact={name:name.trim(),phone:phone.trim()};
  }
  try{await gpWishlistLead(id,contact,'added')}catch(e){alert(e.message);return false;}
