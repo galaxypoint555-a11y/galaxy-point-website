@@ -61,7 +61,7 @@
   <div class="main">
     <header class="topbar">
       <div style="display:flex;align-items:center;gap:12px"><button class="icon-btn mobile-menu" id="mobileMenu" aria-label="Open menu"><svg class="icon"><use href="#ic-menu"/></svg></button><div class="crumb">Galaxy Point <span style="color:#c1c9d7;padding:0 8px">/</span> <b id="breadcrumb">Overview</b></div></div>
-      <div class="top-actions"><span class="demo-chip">● CONNECTED</span><button class="icon-btn" title="Order notifications" id="notificationsBtn"><svg class="icon"><use href="#ic-bell"/></svg><i class="notif-dot"></i></button><div class="top-profile"><div class="circle-avatar">GP</div><div><span>Boss Account</span><small>Admin</small></div></div></div>
+      <div class="top-actions"><span class="demo-chip">● CONNECTED</span><button class="icon-btn" title="Order notifications" id="notificationsBtn"><svg class="icon"><use href="#ic-bell"/></svg><i class="notif-dot"></i></button><div class="top-profile"><div class="circle-avatar">GP</div><div><span>Jagdish</span><small>Boss Account</small></div></div></div>
     </header>
     <main class="content" id="page" aria-live="polite"></main>
   </div>
@@ -110,7 +110,9 @@ const recent=()=>orders.filter(o=>new Date(o.created_at)>=new Date(Date.now()-pe
 const paid=()=>recent().filter(o=>o.payment_status==='Paid');
 const kpi=(name,value)=>'<div class="kpi"><div class="kpi-label">'+name+'</div><div class="kpi-val">'+value+'</div></div>';
 const tabs=()=>'<div class="period">'+[1,7,30].map(d=>'<button data-period="'+d+'" class="'+(period===d?'active':'')+'">'+(d===1?'Today':d+' days')+'</button>').join('')+'</div>';
-const heading=(title,desc)=>'<div class="pagehead"><div><h1 class="page-title">'+title+'</h1><p class="subtitle">'+desc+'</p></div><div class="page-tools">'+tabs()+'</div></div>';
+const bossGreeting=()=>{const hour=Number(new Intl.DateTimeFormat('en-GB',{hour:'numeric',hour12:false,timeZone:'Asia/Kolkata'}).format(new Date()));return hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';};
+const heading=(title,desc)=>'<div class="pagehead"><div>'+(page==='overview'?'<div class="eyebrow">YOUR WEBSITE, UNDER CONTROL</div><h1 class="page-title" id="bossGreeting">'+bossGreeting()+', Jagdish 👋</h1>':'<h1 class="page-title">'+title+'</h1>')+'<p class="subtitle">'+desc+'</p></div><div class="page-tools">'+tabs()+'</div></div>';
+setInterval(()=>{const greeting=document.querySelector('#bossGreeting');if(greeting)greeting.textContent=bossGreeting()+', Jagdish 👋';},60000);
 const cname=id=>customers.find(c=>c.id===id)||{};
 const orderRows=arr=>'<div class="table-wrap"><table class="data-table"><thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Fulfillment</th><th>Action</th></tr></thead><tbody>'+ (arr.length?arr.map(o=>'<tr><td class="td-strong">'+esc(o.order_number||o.id)+'</td><td>'+esc(cname(o.customer_id).name||'—')+'</td><td>'+money(o.total_amount)+'</td><td>'+esc(o.payment_status)+'</td><td>'+esc(o.fulfillment_status)+'</td><td><button class="linkbtn" data-order="'+esc(o.id)+'">View</button></td></tr>').join(''):'<tr><td colspan="6" class="empty">No orders found.</td></tr>')+'</tbody></table></div>';
 const productRows=()=>'<div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Variant</th><th>Price</th><th>Stock</th><th>Published</th></tr></thead><tbody>'+products.map(p=>'<tr><td class="td-strong">'+esc(p.name)+'</td><td>'+esc(p.category)+'</td><td>'+esc(p.variant)+'</td><td>'+money(p.price)+'</td><td>'+Number(p.stock||0)+'</td><td>'+(p.is_published?'Yes':'No')+'</td></tr>').join('')+'</tbody></table></div>';
