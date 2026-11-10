@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Galaxy Point | Website Editor</title>
+<style>
+:root{--navy:#17263b;--blue:#235fe4;--ink:#1b2a40;--muted:#69798d;--line:#e3eaf2;--bg:#f5f7fb;--green:#087b54}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Segoe UI",Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.app{display:flex;min-height:100vh}.sidebar{background:var(--navy);color:#e2e9f6;width:250px;padding:25px 16px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}.brand{display:flex;gap:11px;align-items:center;margin:5px 8px 32px}.logo{background:#e7eeff;color:#285bdf;font-weight:900;border-radius:13px;font-size:19px;padding:13px}.brand b{display:block;font-size:18px}.brand small{font-size:10px;letter-spacing:1.5px}.nav{padding:13px;border:0;background:transparent;text-align:left;color:#c4d3e7;border-radius:10px;font-weight:700;display:block;width:100%}.nav.active,.nav:hover{background:#2e4665;color:#fff}.sidebar .links{margin-top:auto;display:grid;gap:9px;padding:12px 4px;font-size:12px;color:#c2d3e5}.main{flex:1;min-width:0}.top{background:#fff;padding:22px 30px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.top strong{font-size:18px}.top a{font-weight:700;color:var(--blue)}.content{padding:28px 32px;max-width:1400px}.pagehead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:23px}.pagehead h1{margin:0 0 6px;font-size:27px}.sub{color:var(--muted);font-size:13px;margin:0}.box,.stat{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:0 4px 18px #26374a07}.box{padding:24px;margin-bottom:18px}.box h2{font-size:19px;margin:0 0 16px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:0 0 22px}.stat{padding:22px}.stat span{color:var(--muted);display:block}.stat strong{font-size:30px}.btn{background:#fff;color:#1e2d42;border:1px solid #dce4f0;padding:11px 16px;border-radius:9px;font-weight:750}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.red{color:#c03a3a;border-color:#efc4c4}.btn:disabled{opacity:.6}.field{display:flex;flex-direction:column;gap:6px}.field label{font-weight:700;color:#526579;font-size:12px}.field input,.field select,.field textarea{border:1px solid #dbe3ee;border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);width:100%}.field textarea{min-height:85px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.span2{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.checks{display:flex;align-items:center;gap:25px;margin-top:14px}.checks label{display:flex;gap:8px;align-items:center;font-weight:700}.toolbar{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:15px}.search{border:1px solid #dbe3ee;padding:10px 12px;border-radius:9px;min-width:260px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:620px}td,th{text-align:left;padding:12px 10px;border-bottom:1px solid #edf0f5}th{font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:#738397}td small{display:block;color:#8793a3}td b{font-size:13px}.chip{display:inline-block;background:#e6f6ef;color:#0c7852;border-radius:25px;padding:4px 9px;font-size:11px;font-weight:800}.chip.off{background:#f1f3f6;color:#687485}.mini{padding:6px 10px}.msg{border-radius:11px;padding:13px 15px;margin-bottom:18px;background:#e7f7f0;color:#086445;border:1px solid #c5e6d7}.msg.err{background:#fff2f2;color:#a32f2f;border-color:#f5cfcf}.login{max-width:420px;margin:9vh auto}.login h1{font-size:26px;margin:0 0 7px}.login form{display:grid;gap:14px}.help{font-size:12px;color:var(--muted);margin-top:8px}.hidden{display:none!important}.preview{max-height:200px;max-width:100%;object-fit:cover;border-radius:8px;margin-top:10px}.empty{padding:36px 15px;text-align:center;color:var(--muted)}.status{color:#ad741b;background:#fff6e4;border-radius:20px;padding:6px 11px;font-size:12px;font-weight:800}.status.ok{color:#08744f;background:#e7f6ed}.notice{background:#fbf7e8;color:#866824;padding:13px 16px;border-radius:10px;margin-bottom:18px}@media(max-width:820px){.app{display:block}.sidebar{width:auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:12px}.brand{margin:0 12px 0 0}.nav{width:auto}.sidebar .links{margin:0}.top{padding:15px}.content{padding:18px}.stats{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.span2{grid-column:auto}.pagehead{align-items:flex-start;flex-direction:column}}
+</style></head>
+<body><div class="app"><aside class="sidebar"><div class="brand"><div class="logo">GP</div><div><b>Galaxy Point</b><small>WEBSITE EDITOR</small></div></div><button class="nav active" data-tab="products">📱 Products & Stock</button><button class="nav" data-tab="homepage">🎬 Homepage Media</button><button class="nav" data-tab="settings">⚙️ Publishing</button><div class="links"><a href="index.html" target="_blank">↗ Shopping Website</a><a href="boss.html" target="_blank">↗ Boss Dashboard</a><button class="btn hidden" id="logout" style="text-align:left">Sign Out</button></div></aside><main class="main"><header class="top"><strong>Website Management</strong><div><span class="status" id="connection">Connection required</span>　 <a href="index.html" target="_blank">View Store ↗</a></div></header><div class="content"><div id="message"></div><div id="view"></div></div></main></div>
+<script src="gp-config.js"></script><script src="gp-cloud.js"></script>
+<script>
+(()=>{
+'use strict';
+const C=window.GPCloud,esc=C.clean;
+const $=id=>document.getElementById(id);
+const state={tab:'products',products:[],site:{},edit:null,busy:false};
+function tell(msg,error=false){$('message').innerHTML='<div class="msg'+(error?' err':'')+'">'+esc(msg)+'</div>';window.scrollTo({top:0,behavior:'smooth'});}
+function ready(){return C.active();}
+const fld=(label,name,value='',type='text',extra='')=>'<div class="field"><label>'+esc(label)+'</label><input type="'+type+'" name="'+name+'" value="'+esc(value??'')+'" '+extra+'></div>';
+function login(){
+$('view').innerHTML='<div class="box login"><h1>Secure Staff Sign In</h1><p class="sub">Only authorized Galaxy Point staff can publish website changes.</p><form id="auth"><div class="field"><label>Email</label><input name="email" type="email" required autocomplete="username"></div><div class="field"><label>Password</label><input name="password" type="password" required autocomplete="current-password"></div><button class="btn primary" type="submit">SIGN IN</button></form></div>';
+$('auth').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await C.signIn(f.get('email'),f.get('password'));tell('Signed in successfully.');await refresh();}catch(err){tell(err.message,true);}};
+}
+function locked(){if(!C.configured()){$('view').innerHTML='<div class="box"><h2>Cloud setup required</h2><p>Set <code>supabaseUrl</code> and the public <code>supabaseAnonKey</code> in <code>gp-config.js</code>, apply <code>supabase/schema.sql</code>, and authorize staff accounts before publishing.</p><p class="help">Do not enter private service_role keys, database passwords, or payment secrets into the website.</p></div>';return true;}return false;}
+async function refresh(){
+ if(!ready()){render();return;}
+ try{
+  const [ps,site]=await Promise.all([C.products(),C.settings()]);
+  state.products=ps;state.site=site;render();
+ }catch(err){tell(err.message,true);}
+}
+function render(){
+ $('logout').classList.toggle('hidden',!ready());
+ $('connection').classList.toggle('ok',ready());
+ $('connection').textContent=ready()?'Staff connected':'Connection required';
+ document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.tab));
+ if(locked())return;
+ if(!ready()){login();return;}
+ $('view').innerHTML=state.tab==='homepage'?homepage():state.tab==='settings'?settings():productsPage();
+ bind();
+}
+function productsPage(){
+ const ps=state.products;const low=ps.filter(p=>p.active&&Number(p.stock)<=2).length;
+ return '<div class="pagehead"><div><h1>Products & Stock</h1><p class="sub">Changes are saved to the cloud catalog used by the shopping website.</p></div><button class="btn primary" id="add">+ Add Product</button></div>'+
+ '<div class="stats"><div class="stat"><span>Products</span><strong>'+ps.length+'</strong></div><div class="stat"><span>Visible on Website</span><strong>'+ps.filter(p=>p.active).length+'</strong></div><div class="stat"><span>Low / Out of Stock</span><strong>'+low+'</strong></div></div>'+
+ '<div class="box"><div class="toolbar"><h2 style="margin:0">Manage Inventory</h2><input id="find" class="search" placeholder="Search product or brand"></div><div class="tablewrap"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Website</th><th>Action</th></tr></thead><tbody id="rows">'+rows(ps)+'</tbody></table></div></div>'+
+ '<div id="productForm">'+(state.edit!==null?productForm(state.edit):'')+'</div>';
+}
+function rows(ps){
+ if(!ps.length)return '<tr><td colspan="6" class="empty">No products have been published yet. Add your first real product.</td></tr>';
+ return ps.map(p=>'<tr><td><b>'+esc(p.title)+'</b><small>'+esc(p.variant||'')+'</small></td><td>'+esc(p.category)+'</td><td>'+C.money(p.price_inr)+'</td><td>'+Number(p.stock||0)+'</td><td><span class="chip '+(p.active?'':'off')+'">'+(p.active?'Visible':'Hidden')+'</span></td><td><button class="btn mini" data-edit="'+esc(p.id)+'">Edit</button></td></tr>').join('');
+}
+function productForm(p){
+ p=p||{};
+ return '<section class="box"><h2>'+(p.id?'Edit Product':'Add New Product')+'</h2><form id="productSave"><input type="hidden" name="id" value="'+esc(p.id||'')+'"><div class="grid">'+
+ fld('Product Name *','title',p.title||'','text','required')+fld('Brand *','brand',p.brand||'','text','required')+
+ '<div class="field"><label>Category *</label><select name="category">'+['iPhone','Samsung','Android','Laptops','Tablets','Watches','Accessories'].map(x=>'<option '+(x===p.category?'selected':'')+'>'+x+'</option>').join('')+'</select></div>'+
+ fld('Variant / Storage *','variant',p.variant||'','text','required')+
+ '<div class="field"><label>Condition</label><select name="condition">'+['New','Pre-owned','Open Box'].map(x=>'<option '+(x===p.condition?'selected':'')+'>'+x+'</option>').join('')+'</select></div>'+
+ fld('Color','color',p.color||'')+fld('Selling Price ₹ *','price_inr',p.price_inr||'','number','min="1" step="1" required')+
+ fld('Original Price ₹','original_price_inr',p.original_price_inr||'','number','min="0" step="1"')+
+ fld('Stock Quantity *','stock',p.stock??0,'number','min="0" step="1" required')+
+ fld('Product Image URL','image_url',p.image_url||'','url')+
+ '<div class="field"><label>Or Upload Product Photo</label><input type="file" name="photo_file" accept="image/png,image/jpeg,image/webp"><span class="help">Stored in Supabase Media Storage (max 30 MB).</span></div>'+
+ '<div class="field span2"><label>Description</label><textarea name="description">'+esc(p.description||'')+'</textarea></div>'+
+ '<div class="checks span2"><label><input type="checkbox" name="featured" '+(p.featured?'checked':'')+'> Featured</label><label><input type="checkbox" name="active" '+(p.active!==false?'checked':'')+'> Show on Website</label></div></div><div class="actions"><button type="submit" class="btn primary">Save & Publish</button><button type="button" class="btn" id="cancel">Cancel</button>'+(p.id?'<button type="button" class="btn red" id="delete">Delete Product</button>':'')+'</div></form></section>';
+}
+function homepage(){
+ const s=state.site;
+ return '<div class="pagehead"><div><h1>Homepage Media</h1><p class="sub">Upload banners and videos without changing website code.</p></div><a class="btn" href="index.html" target="_blank">View Website ↗</a></div>'+
+ '<div class="box"><h2>Hero Section</h2><form id="homeSave"><div class="grid">'+fld('Hero Headline','hero_title',s.hero_title||'Browse our latest products')+fld('Small Heading','hero_label',s.hero_label||'THE GALAXY EDIT · 2026')+
+ fld('Hero Video URL','hero_video_url',s.hero_video_url||'','url')+fld('Hero Background Image URL','hero_image_url',s.hero_image_url||'','url')+
+ '<div class="field"><label>Upload Video (MP4/WebM)</label><input type="file" name="hero_video_file" accept="video/mp4,video/webm"></div><div class="field"><label>Upload Hero Image</label><input type="file" name="hero_image_file" accept="image/png,image/jpeg,image/webp"></div></div><p class="help">If a video URL is saved, it takes priority over the hero image.</p>'+
+ '<h2 style="margin-top:28px">Offer Banner</h2><div class="grid">'+fld('Banner Image URL','banner_image_url',s.banner_image_url||'','url')+fld('Banner Link (internal #shop link)','banner_link',s.banner_link||'#shop')+
+ '<div class="field"><label>Upload Banner Image</label><input type="file" name="banner_file" accept="image/png,image/jpeg,image/webp"></div></div><div class="actions"><button class="btn primary">Save & Publish Homepage</button></div></form></div>';
+}
+function settings(){
+ return '<div class="pagehead"><div><h1>Publishing</h1><p class="sub">All panels read from the same Supabase project.</p></div></div>'+
+ '<div class="box"><h2>Connected Services</h2><p>Staff: <strong>'+esc(C.user?.email||'')+'</strong></p><p>Role: <strong>'+esc(C.role||'')+'</strong></p><p>Database: <strong>'+esc(C.cfg.supabaseUrl||'Not configured')+'</strong></p><p>Website: <a href="index.html" target="_blank">Shopping Website ↗</a></p><p>Orders: <a href="boss.html" target="_blank">Boss Dashboard ↗</a></p><div class="notice">Online payment stays disabled until the payment gateway and verified payment webhook are configured.</div><button class="btn" id="reload">Refresh Cloud Data</button></div>';
+}
+async function saveProduct(form){
+ const fd=new FormData(form);
+ const name=String(fd.get('title')||'').trim(),brand=String(fd.get('brand')||'').trim(),variant=String(fd.get('variant')||'').trim();
+ const price=Number(fd.get('price_inr')),stock=Number(fd.get('stock'));
+ if(!name||!brand||!variant||!Number.isInteger(price)||price<=0||!Number.isInteger(stock)||stock<0)throw Error('Enter a valid name, brand, variant, positive price and stock.');
+ let url=String(fd.get('image_url')||'').trim();
+ const file=fd.get('photo_file');
+ if(file instanceof File&&file.size)url=await C.upload(file,'catalog');
+ if(url&&!/^https?:\/\//i.test(url))throw Error('Image URL must start with HTTPS or HTTP.');
+ const id=String(fd.get('id')||'');
+ const fields={title:name,brand,variant,category:String(fd.get('category')),condition:String(fd.get('condition')),color:String(fd.get('color')||''),price_inr:price,stock,original_price_inr:fd.get('original_price_inr')?Number(fd.get('original_price_inr')):null,image_url:url||null,description:String(fd.get('description')||''),featured:fd.has('featured'),active:fd.has('active')};
+ if(!id){fields.slug=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,65)+'-'+Date.now().toString(36);}
+ await C.upsertProduct(fields,id||null);state.edit=null;await refresh();tell('Product published to the shared website catalog.');
+}
+async function saveHome(form){
+ const fd=new FormData(form),fields={};
+ for(const f of ['hero_title','hero_label','hero_video_url','hero_image_url','banner_image_url','banner_link'])fields[f]=String(fd.get(f)||'').trim();
+ for(const [key,folder,prop] of [['hero_video_file','videos','hero_video_url'],['hero_image_file','banners','hero_image_url'],['banner_file','banners','banner_image_url']]){
+ const f=fd.get(key);if(f instanceof File&&f.size)fields[prop]=await C.upload(f,folder);
+ }
+ for(const f of ['hero_video_url','hero_image_url','banner_image_url'])if(fields[f]&&!/^https?:\/\//i.test(fields[f]))throw Error('Media URL must start with HTTPS or HTTP.');
+ if(fields.banner_link&&!fields.banner_link.startsWith('#'))throw Error('Banner link must be an internal link, e.g. #shop.');
+ await C.saveSettings(fields);await refresh();tell('Homepage content published to the shared website database.');
+}
+function busy(b){state.busy=b;document.querySelectorAll('button[type=submit]').forEach(x=>x.disabled=b);}
+function bind(){
+ $('add')?.addEventListener('click',()=>{state.edit={};render();$('productForm').scrollIntoView({behavior:'smooth'});});
+ $('find')?.addEventListener('input',e=>{$('rows').innerHTML=rows(state.products.filter(p=>(p.title+' '+p.brand+' '+p.variant).toLowerCase().includes(e.target.value.toLowerCase())));});
+ $('view').onclick=e=>{
+ const edit=e.target.closest('[data-edit]');if(edit){state.edit=state.products.find(p=>String(p.id)===edit.dataset.edit);render();$('productForm').scrollIntoView({behavior:'smooth'});}
+ if(e.target.id==='cancel'){state.edit=null;render();}
+ if(e.target.id==='reload'){refresh();}
+ if(e.target.id==='delete'&&state.edit?.id&&confirm('Permanently delete this product from the live website?')){C.removeProduct(state.edit.id).then(()=>{state.edit=null;refresh();tell('Product deleted.');}).catch(err=>tell(err.message,true));}
+ };
+ $('productSave')?.addEventListener('submit',async e=>{e.preventDefault();if(state.busy)return;busy(true);try{await saveProduct(e.target);}catch(err){tell(err.message,true);}finally{busy(false);}});
+ $('homeSave')?.addEventListener('submit',async e=>{e.preventDefault();if(state.busy)return;busy(true);try{await saveHome(e.target);}catch(err){tell(err.message,true);}finally{busy(false);}});
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;state.edit=null;$('message').innerHTML='';render();});
+$('logout').onclick=async()=>{await C.signOut();render();};
+(async()=>{if(!C.configured())return render();try{await C.ensureSession();}catch(e){tell(e.message,true);}await refresh();})();
+setInterval(()=>{if(ready()&&!state.busy&&!document.hidden&&state.edit===null&&state.tab==='products')refresh();},30000);
+})();
+</script></body></html>
