@@ -42,12 +42,16 @@ window.GPCloud=(()=>{
   }
   function active(){return Boolean(session?.access_token&&user&&role);}
   function guard(){if(!active())throw Error('Sign in with an authorized staff account first.');}
-  async function products(){guard();const rows=await request('/rest/v1/products?select=*&order=created_at.desc&limit=500');return rows.map(p=>({...p,title:p.name,brand:p.category,price_inr:p.price,active:p.is_published,condition:'Pre-owned'}));}
+  async function products(){guard();const rows=await request('/rest/v1/products?select=*&order=created_at.desc&limit=500');return rows.map(p=>({...p,name:p.title,price:p.price_inr,condition:p.condition||'Pre-owned',is_published:p.is_published??p.active??false}));}
   async function settings(){guard();const rows=await request('/rest/v1/website_settings?select=key,value');return Object.fromEntries(rows.map(x=>[x.key,x.value]));}
   async function saveSettings(fields){guard();return request('/rest/v1/website_settings?on_conflict=key',{method:'POST',body:Object.entries(fields).map(([key,value])=>({key,value})),extra:{Prefer:'resolution=merge-duplicates,return=minimal'}});}
-  async function upsertProduct(fields,id){guard();const data={name:fields.title,category:fields.category,variant:fields.variant,description:fields.description,price:fields.price_inr,stock:fields.stock,image_url:fields.image_url,is_published:fields.active};return id
-     ?request('/rest/v1/products?id=eq.'+q(id),{method:'PATCH',body:data,extra:{Prefer:'return=minimal'}})
-     :request('/rest/v1/products',{method:'POST',body:data,extra:{Prefer:'return=minimal'}});}
+  async function upsertProduct(fields,id){
+    guard();
+    const data={title:fields.title,category:fields.category,variant:fields.variant,description:fields.description,price_inr:fields.price_inr,stock:fields.stock,image_url:fields.image_url,is_published:fields.active,active:fields.active};
+    if(id)return request('/rest/v1/products?id=eq.'+q(id),{method:'PATCH',body:data,extra:{Prefer:'return=minimal'}});
+    const slug=(String(fields.title||'product').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,65)||'product')+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
+    return request('/rest/v1/products',{method:'POST',body:{...data,slug,condition:fields.condition||'Pre-owned'},extra:{Prefer:'return=minimal'}});
+  }
   async function removeProduct(id){guard();return request('/rest/v1/products?id=eq.'+q(id),{method:'DELETE',extra:{Prefer:'return=minimal'}});}
   async function orders(){guard();return request('/rest/v1/orders?select=*,order_items(*)&payment_status=eq.Paid&order=created_at.desc&limit=500');}
   async function updateOrderStatus(id,status){guard();return request('/rest/v1/orders?id=eq.'+q(id),{method:'PATCH',body:{fulfillment_status:status},extra:{Prefer:'return=minimal'}});}
