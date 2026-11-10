@@ -194,9 +194,8 @@ async function gpLoadPublishedCatalog(){
   const rows=await response.json();
   if(!Array.isArray(rows))throw Error('Invalid catalog');
   // Empty database is not treated as published inventory: retain the original storefront.
-  if(!rows.length)return;
   items=rows.map((p,i)=>({id:p.id,name:p.title,brand:p.brand,category:p.category,details:[p.variant,p.condition].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
-  if(page==='home'||page==='shop')show();
+  show();
  }catch(err){console.warn('Galaxy Point catalog sync unavailable; retaining existing storefront.',err);}
 }
 gpLoadPublishedCatalog();
