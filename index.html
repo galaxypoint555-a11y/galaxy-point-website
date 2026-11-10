@@ -173,6 +173,7 @@ function setupStoreVideo(){
  const v=document.getElementById("gpStoreVideo");
  if(!v)return;
  const hero=v.closest(".hero");
+ if(!window.gpVideoSettingsLoaded)return;
  const gpPlaylist=["gp-happy-diwali.mp4","gp-new-stock.mp4"];
  const gpStartPlaylist=async()=>{
    const available=await Promise.all(gpPlaylist.map(async url=>{try{const response=await fetch(url,{method:"HEAD",cache:"no-store"});return response.ok}catch{return false}}));
@@ -190,7 +191,7 @@ function setupStoreVideo(){
  };
  const playlistReady=gpStartPlaylist();
  const configuredVideo=window.gpPublishedSettings?.hero_video_url;
- const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"galaxy-point-home-hls/index.m3u8";
+ const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"";
  const directVideo=/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source);
  v.muted=true;v.defaultMuted=true;v.autoplay=true;v.playsInline=true;v.loop=true;
  v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.setAttribute("autoplay","");
@@ -202,7 +203,7 @@ function setupStoreVideo(){
  v.addEventListener("playing",()=>{hero.classList.add("video-ready")});
  v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)playback()});
  
- playlistReady.then(ready=>{if(ready)return;
+ playlistReady.then(ready=>{if(ready||!source)return;
  if(directVideo){v.src=source;v.load();playback();}
  else if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
    v.src=source;v.load();playback();
@@ -290,8 +291,10 @@ async function gpLoadSiteSettings(){
     if(typeof url==='string'&&/^https:\/\//.test(url))categoryImages[name]=url;
    }
   }
+  window.gpVideoSettingsLoaded=true;
   if(page==='home'&&settingsChanged)show();
- }catch(err){console.warn('Galaxy Point site settings unavailable',err)}
+  else if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;show();}
+ }catch(err){console.warn('Galaxy Point site settings unavailable',err);window.gpVideoSettingsLoaded=true;if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;show();}}
 }
 gpLoadSiteSettings();
 // Fast cloud sync: refresh when customers return to the tab and while it stays open.
