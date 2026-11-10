@@ -93,6 +93,7 @@ function login(){
    const res=await fetch(base+'/auth/v1/token?grant_type=password',{method:'POST',signal:controller.signal,headers:{apikey:cfg.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email:String(f.get('email')||'').trim(),password:f.get('password')})});
    const data=await res.json().catch(()=>({}));
    if(!res.ok||!data.access_token)throw Error(data.error_description||data.msg||data.error||'Email or password is incorrect.');
+   if(String(data.user?.email||'').trim().toLowerCase()!=='jagdish@gmail.com')throw Error('Access denied. This dashboard is reserved for the Boss account.');
    token=data.access_token;error.textContent='Login successful. Checking dashboard access…';
    const staff=await Promise.race([api('staff_profiles?select=role&user_id=eq.'+encodeURIComponent(data.user.id)),new Promise((_,reject)=>setTimeout(()=>reject(Error('Permission check timed out. Please try again.')),12000))]);
    if(!staff.length||staff[0].role!=='boss')throw Error('Boss-only access required. This account does not have the boss role.');
