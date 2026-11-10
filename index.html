@@ -145,6 +145,22 @@ function setupStoreVideo(){
  const v=document.getElementById("gpStoreVideo");
  if(!v)return;
  const hero=v.closest(".hero");
+ const gpPlaylist=["gp-happy-diwali.mp4","gp-new-stock.mp4"];
+ const gpStartPlaylist=async()=>{
+   const available=await Promise.all(gpPlaylist.map(async url=>{try{const response=await fetch(url,{method:"HEAD",cache:"no-store"});return response.ok}catch{return false}}));
+   if(!v.isConnected||!available.every(Boolean))return false;
+   if(window.gpRunningHls&&typeof window.gpRunningHls.destroy==="function"){window.gpRunningHls.destroy();window.gpRunningHls=null}
+   let index=0;
+   v.loop=false;v.muted=true;v.defaultMuted=true;v.playsInline=true;
+   v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("autoplay","");
+   v.removeAttribute("loop");
+   const next=()=>{if(!v.isConnected)return;v.src=gpPlaylist[index];v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{})};
+   v.addEventListener("ended",()=>{index=(index+1)%gpPlaylist.length;next()});
+   v.addEventListener("playing",()=>hero.classList.add("video-ready"));
+   document.addEventListener("visibilitychange",()=>{if(!document.hidden&&v.isConnected&&v.paused){const p=v.play();if(p&&p.catch)p.catch(()=>{})}});
+   next();return true;
+ };
+ const playlistReady=gpStartPlaylist();
  const configuredVideo=window.gpPublishedSettings?.hero_video_url;
  const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"galaxy-point-home-hls/index.m3u8";
  const directVideo=/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source);
@@ -158,6 +174,7 @@ function setupStoreVideo(){
  v.addEventListener("playing",()=>{hero.classList.add("video-ready")});
  v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)playback()});
  
+ playlistReady.then(ready=>{if(ready)return;
  if(directVideo){v.src=source;v.load();playback();}
  else if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
    v.src=source;v.load();playback();
@@ -184,6 +201,7 @@ function setupStoreVideo(){
      document.head.appendChild(script);
    }
  }
+ });
  if(!window.gpVideoVisibilityBound){
    window.gpVideoVisibilityBound=true;
    document.addEventListener("visibilitychange",()=>{
