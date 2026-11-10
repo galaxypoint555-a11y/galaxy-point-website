@@ -88,7 +88,7 @@
 <main id="view"></main><button class="chat" id="chatBtn" aria-label="Store contact">☏</button>
 <script>
 (function(){
-const items=[
+let items=[
 {id:1,name:"iPhone 17 Pro Max",brand:"APPLE",details:"Premium collection • Storage on enquiry",price:null,category:"iPhone",stock:3},
 {id:2,name:"iPhone 16 Pro Max",brand:"APPLE",details:"Premium collection • Storage on enquiry",price:null,category:"iPhone",stock:3},
 {id:3,name:"Samsung Galaxy Z Fold 5",brand:"SAMSUNG",details:"Fold series • Condition on enquiry",price:null,category:"Samsung",stock:2},
@@ -177,5 +177,25 @@ document.getElementById("menuBtn").addEventListener("click",()=>document.getElem
 document.getElementById("chatBtn").addEventListener("click",()=>alert("Galaxy Point Kharghar — Visit Shop No. 49, Tiara Mall, Sector 13. This is a demo; WhatsApp is not configured yet."));
 document.addEventListener("submit",function(e){if(e.target.id==="checkoutForm"){e.preventDefault();const f=new FormData(e.target);const id="GP-DEMO-"+Math.floor(1000+Math.random()*9000);orders.push({id,name:String(f.get("name")).slice(0,70),total:sum()});bag={};page="track";show();document.getElementById("trackResult").innerHTML='<div class="callout"><strong>Demo order created:</strong> '+id+'<br>No real order was submitted. Enter the ID above to try order tracking.</div>'}else if(e.target.id==="trackForm"){e.preventDefault();const f=new FormData(e.target),id=String(f.get("id")).trim().toUpperCase(),o=orders.find(x=>x.id===id);document.getElementById("trackResult").innerHTML=o?'<div class="callout"><strong>'+o.id+'</strong><br>Status: Demo Pending<br>Amount: '+money(o.total)+'</div>':'<div class="callout">No matching demo order in this browser session.</div>'}});
 show();
+
+// Public catalog synchronization: reads only published active inventory.
+// No customer credentials, staff permissions, or payment features are used.
+async function gpLoadPublishedCatalog(){
+ try{
+  const cfg=window.GP_CONFIG;
+  if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey)return;
+  const base=cfg.supabaseUrl.replace(/\/$/,'');
+  const headers={apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey};
+  const response=await fetch(base+'/rest/v1/products?select=id,title,brand,category,variant,condition,price_inr,stock,image_url,active&active=eq.true&order=created_at.desc&limit=500',{headers});
+  if(!response.ok)throw Error('Catalog fetch failed: '+response.status);
+  const rows=await response.json();
+  if(!Array.isArray(rows))throw Error('Invalid catalog');
+  // Empty database is not treated as published inventory: retain the original storefront.
+  if(!rows.length)return;
+  items=rows.map((p,i)=>({id:p.id,name:p.title,brand:p.brand,category:p.category,details:[p.variant,p.condition].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
+  if(page==='home'||page==='shop')show();
+ }catch(err){console.warn('Galaxy Point catalog sync unavailable; retaining existing storefront.',err);}
+}
+gpLoadPublishedCatalog();
 })();
-</script></body></html>
+</script><script src="gp-config.js"></script></body></html>
