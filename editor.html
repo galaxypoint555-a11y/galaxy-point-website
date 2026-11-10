@@ -22,7 +22,7 @@
 <div class="side-footer"><b><span class="dot"></span> Website Manager</b><p>Staff access required. Verify changes on the customer website after saving.</p></div></aside>
 <div class="main"><div class="topbar"><div style="display:flex;align-items:center;gap:11px"><button class="btn mobile-menu sm" id="menuToggle" aria-label="Open menu">☰</button><div class="crumb">Galaxy Point / <b id="page-crumb">Overview</b></div></div><div class="top-actions"><span class="demo-pill">● STAFF EDITOR</span><button class="btn sm" id="top-preview">◉ Preview</button><button class="btn primary sm" id="top-publish">↑ Save Website Settings</button><div class="user-avatar" title="Editor preview account">GP</div></div></div>
 <main class="workspace">
-<section class="page active" id="page-overview"><div class="pagehead"><div><div class="eyebrow">Your website, under control</div><h1>Good afternoon, Galaxy Point 👋</h1><p>Update your entire store in minutes. No coding. No GitHub editing.</p></div><button class="btn primary" data-nav="preview">◉ View Website Preview</button></div>
+<section class="page active" id="page-overview"><div class="pagehead"><div><div class="eyebrow">Your website, under control</div><h1 id="gp-time-greeting">Good afternoon, Galaxy Point 👋</h1><p>Update your entire store in minutes. No coding. No GitHub editing.</p></div><button class="btn primary" data-nav="preview">◉ View Website Preview</button></div>
 <div class="notice"><span class="notice-ico">✦</span><div><strong>Manage Galaxy Point website content</strong><p>Edit products and content here. Confirm saved changes on the actual customer website.</p></div><button class="btn soft" data-nav="help">How it works →</button></div>
 <div class="grid-4" id="overview-metrics"></div>
 <div class="two-col" style="margin-top:20px"><div class="card card-pad"><div class="section-row"><h3>What would you like to update?</h3><span class="sub">One-click actions</span></div><div class="quick-grid"><button class="quick-tile" data-nav="homepage"><span class="tile-icon">▶</span><b>Change Video</b><small>Upload new homepage video and update heading.</small></button><button class="quick-tile" data-nav="banners"><span class="tile-icon">▧</span><b>Change Banner</b><small>Edit today's promotion or upload a banner.</small></button><button class="quick-tile" data-nav="products"><span class="tile-icon">▣</span><b>Update Stock</b><small>Change prices, add devices, set quantities.</small></button></div><div style="margin-top:17px;background:#f9faff;border:1px solid #eef0fb;padding:15px;border-radius:13px"><b style="font-size:12px">Simple 3-step workflow</b><div class="sub" style="margin-top:6px;color:#77839a">1. Make a change &nbsp;→&nbsp; 2. Preview it &nbsp;→&nbsp; 3. Save Website Settings</div></div></div><div class="card card-pad"><div class="section-row"><h3>Latest Activity</h3><button class="link" data-nav="history">View all →</button></div><div id="activity-snapshot"></div></div></div>
@@ -122,4 +122,16 @@ document.addEventListener('change',async e=>{if(e.target.dataset.catUpload){cons
 $('top-preview').onclick=()=>navigate('preview');['top-publish','preview-publish','preview-publish-bottom'].forEach(id=>$(id).onclick=publishDemo);$('menuToggle').onclick=()=>$('sidebar').classList.toggle('open');$('modal-close').onclick=closeModal;$('editor-overlay').addEventListener('click',e=>{if(e.target===$('editor-overlay'))closeModal});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('reset-preview').onclick=async()=>{if(!confirm('Reload live data and discard unsaved text changes?'))return;try{await refreshCloud();toast('Reloaded live website data.')}catch(err){toast(err.message)}};
 (async()=>{renderAll();try{const user=await cloud.ensureSession();if(user){await refreshCloud();cloudReady=true;return;}}catch(e){console.warn('Staff session unavailable',e)}authOverlay()})();
+</script><script>
+(function(){
+  const el=document.getElementById('gp-time-greeting');
+  if(!el)return;
+  function updateGreeting(){
+    const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'numeric',hourCycle:'h23'}).format(new Date()));
+    const greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+    el.textContent=greeting+', Galaxy Point 👋';
+  }
+  updateGreeting();
+  setInterval(updateGreeting,60000);
+})();
 </script></body></html>
