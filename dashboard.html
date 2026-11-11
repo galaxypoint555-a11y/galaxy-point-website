@@ -46,6 +46,33 @@
 .gp-customer-refresh:hover{background:#e6eeff}
 .gp-customer-refresh:disabled{opacity:.65;cursor:wait}
 .gp-customer-refresh-status{font-size:12px;color:#71839d}
+</style><style id="gp-boss-login-upgrade">
+body.gp-boss-signin{background:#eef2fb}
+body.gp-boss-signin .sidebar{display:none!important}
+body.gp-boss-signin .main{margin-left:0!important;width:100%!important}
+body.gp-boss-signin .topbar{display:none!important}
+body.gp-boss-signin .content{max-width:none!important;width:100%!important;padding:clamp(18px,4vw,55px)!important;min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 12% 20%,#c8d7ff 0,transparent 38%),radial-gradient(circle at 90% 88%,#d5e0fa 0,transparent 38%),#f5f7fc}
+.gp-boss-login-shell{width:min(1100px,100%);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(350px,.9fr);overflow:hidden;background:#fff;border-radius:28px;box-shadow:0 28px 90px #20355c20;border:1px solid #e5eaf4;min-height:580px}
+.gp-boss-login-hero{background:linear-gradient(145deg,#10244f,#264f9e 70%,#4677d4);padding:clamp(32px,5vw,60px);display:flex;flex-direction:column;justify-content:space-between;color:#fff;position:relative;overflow:hidden}
+.gp-boss-login-hero:before{content:'';position:absolute;width:420px;height:420px;border:1px solid #ffffff2a;border-radius:50%;right:-160px;top:-130px;box-shadow:0 0 0 75px #ffffff09,0 0 0 150px #ffffff06;pointer-events:none}
+.gp-boss-login-brand{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.gp-boss-login-brand img{width:70px;height:70px;object-fit:contain;background:#fff;border-radius:18px;padding:6px}
+.gp-boss-login-brand strong{font-size:22px;letter-spacing:.3px}
+.gp-boss-login-hero h1{font-size:clamp(38px,4.6vw,57px);line-height:1.12;letter-spacing:-1.7px;margin:25px 0 18px;position:relative}
+.gp-boss-login-hero p{font-size:16px;line-height:1.75;color:#dce7ff;max-width:390px;position:relative}
+.gp-boss-login-foot{font-size:12px;letter-spacing:1.2px;color:#d5e3ff;position:relative}
+.gp-boss-login-form-area{padding:clamp(30px,5vw,65px);display:flex;flex-direction:column;justify-content:center}
+.gp-boss-login-form-area h2{font-size:32px;letter-spacing:-.8px;margin:0 0 8px;color:#182e55}
+.gp-boss-login-form-area .gp-login-sub{color:#788ba6;margin:0 0 35px;font-size:14px}
+.gp-boss-login-form-area label{display:block;font-size:14px;font-weight:750;color:#33496d;margin-bottom:20px}
+.gp-boss-login-form-area input{width:100%;display:block;margin:9px 0 0;padding:15px 16px;border-radius:12px;border:1.5px solid #dce4f1;background:#fbfcff;font-size:15px}
+.gp-boss-login-form-area input:focus{outline:none;border-color:#5878d6;box-shadow:0 0 0 3px #5878d61c}
+.gp-boss-login-form-area #signInBtn{width:100%;padding:15px;font-size:15px;border-radius:12px;margin-top:6px}
+.gp-boss-login-form-area #loginError{font-size:13px}
+.gp-customer-header{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.gp-customer-header .page-tools{margin-left:0!important}
+.gp-customer-header .period{flex-wrap:wrap}
+@media(max-width:800px){.gp-boss-login-shell{grid-template-columns:1fr}.gp-boss-login-hero{min-height:230px;padding:28px}.gp-boss-login-hero h1{font-size:34px;margin:15px 0 5px}.gp-boss-login-hero p{font-size:13px;margin:0}.gp-boss-login-form-area{padding:32px}.gp-boss-login-foot{display:none}}
 </style></head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
@@ -102,7 +129,8 @@ function message(s){root.innerHTML='<section class="panel"><p>'+esc(s)+'</p></se
 function login(){
  nav.innerHTML='';
  document.querySelector('#breadcrumb').textContent='Sign in';
- root.innerHTML='<div class="pagehead"><h1 class="page-title">Boss Dashboard Login</h1></div><section class="panel" style="max-width:420px"><form id="loginForm"><label>Email<input class="select" style="display:block;width:100%;margin:8px 0 16px" type="email" name="email" required autocomplete="username"></label><label>Password<input class="select" style="display:block;width:100%;margin:8px 0 16px" type="password" name="password" required autocomplete="current-password"></label><button class="btn primary" id="signInBtn" type="submit">Sign in</button><p id="loginError" class="rule" role="alert" aria-live="polite" style="margin-top:14px"></p></form></section>';
+ document.body.classList.add('gp-boss-signin');
+ root.innerHTML='<div class="gp-boss-login-shell"><section class="gp-boss-login-hero"><div class="gp-boss-login-brand"><img src="gp-logo.svg" alt="Galaxy Point logo"><strong>GALAXY POINT</strong></div><div><h1>Welcome Back,<br>Boss.</h1><p>Your business, customers and performance — all in one secure management dashboard.</p></div><div class="gp-boss-login-foot">GALAXY POINT · KHARGHAR</div></section><section class="gp-boss-login-form-area"><h2>Boss Dashboard Login</h2><p class="gp-login-sub">Sign in to access your Galaxy Point management panel.</p><form id="loginForm"><label>Email Address<input type="email" name="email" placeholder="Enter your email address" required autocomplete="username"></label><label>Password<input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password"></label><button class="btn primary" id="signInBtn" type="submit">Sign In to Dashboard</button><p id="loginError" class="rule" role="alert" aria-live="polite"></p></form></section></div>';
  const form=document.querySelector('#loginForm'),error=document.querySelector('#loginError'),btn=document.querySelector('#signInBtn');
  form.addEventListener('submit',async e=>{
   e.preventDefault();
@@ -133,14 +161,14 @@ const paid=()=>recent().filter(o=>o.payment_status==='Paid');
 const kpi=(name,value)=>'<div class="kpi"><div class="kpi-label">'+name+'</div><div class="kpi-val">'+value+'</div></div>';
 const tabs=()=>'<div class="period">'+[1,7,30].map(d=>'<button data-period="'+d+'" class="'+(period===d?'active':'')+'">'+(d===1?'Today':d+' days')+'</button>').join('')+'</div>';
 const bossGreeting=()=>{const hour=Number(new Intl.DateTimeFormat('en-GB',{hour:'numeric',hour12:false,timeZone:'Asia/Kolkata'}).format(new Date()));return hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';};
-const heading=(title,desc)=>'<div class="pagehead"><div>'+(page==='overview'?'<div class="eyebrow">YOUR WEBSITE, UNDER CONTROL</div><h1 class="page-title" id="bossGreeting">'+bossGreeting()+', Jagdish 👋</h1>':'<h1 class="page-title">'+title+'</h1>')+'<p class="subtitle">'+desc+'</p></div><div class="page-tools">'+tabs()+'</div></div>';
+const heading=(title,desc)=>'<div class="pagehead '+(page==='customers'?'gp-customer-header':'')+'"><div>'+(page==='overview'?'<div class="eyebrow">YOUR WEBSITE, UNDER CONTROL</div><h1 class="page-title" id="bossGreeting">'+bossGreeting()+', Jagdish 👋</h1>':'<h1 class="page-title">'+title+'</h1>')+'<p class="subtitle">'+desc+'</p></div><div class="page-tools">'+tabs()+'</div></div>';
 setInterval(()=>{const greeting=document.querySelector('#bossGreeting');if(greeting)greeting.textContent=bossGreeting()+', Jagdish 👋';},60000);
 const cname=id=>customers.find(c=>c.id===id)||{};
 const orderRows=arr=>'<div class="table-wrap"><table class="data-table"><thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Fulfillment</th><th>Action</th></tr></thead><tbody>'+ (arr.length?arr.map(o=>'<tr><td class="td-strong">'+esc(o.order_number||o.id)+'</td><td>'+esc(cname(o.customer_id).name||'—')+'</td><td>'+money(o.total_amount)+'</td><td>'+esc(o.payment_status)+'</td><td>'+esc(o.fulfillment_status)+'</td><td><button class="linkbtn" data-order="'+esc(o.id)+'">View</button></td></tr>').join(''):'<tr><td colspan="6" class="empty">No orders found.</td></tr>')+'</tbody></table></div>';
 const productRows=()=>'<div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Variant</th><th>Price</th><th>Stock</th><th>Published</th></tr></thead><tbody>'+products.map(p=>'<tr><td class="td-strong">'+esc(p.name)+'</td><td>'+esc(p.category)+'</td><td>'+esc(p.variant)+'</td><td>'+money(p.price)+'</td><td>'+Number(p.stock||0)+'</td><td>'+(p.is_published?'Yes':'No')+'</td></tr>').join('')+'</tbody></table></div>';
 const loginRows=source=>{const list=loginEvents.filter(x=>x.source===source);return '<div class="table-wrap"><table class="data-table gp-customer-table"><thead><tr><th>Date / Time</th><th>Customer Name</th><th>Mobile Number</th><th>Action</th></tr></thead><tbody>'+(list.length?list.map(x=>'<tr><td class="gp-customer-date">'+esc(new Date(x.created_at).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}))+'</td><td class="gp-customer-name">'+esc(x.customer_name)+'</td><td class="gp-customer-phone">'+esc(x.phone)+'</td><td><button class="linkbtn" data-delete-login="'+esc(x.id)+'">Remove</button></td></tr>').join(''):'<tr><td colspan="4">No recorded logins</td></tr>')+'</tbody></table></div>'};
 const customerRows=()=>'<div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>City</th></tr></thead><tbody>'+customers.map(c=>'<tr><td>'+esc(c.name)+'</td><td>'+esc(c.phone)+'</td><td>'+esc(c.email)+'</td><td>'+esc(c.city)+'</td></tr>').join('')+'</tbody></table></div>';
-function render(){const navItems=[['overview','Overview'],['orders','Orders'],['products','Products & Stock'],['customers','Customers'],['wishlist','Wishlist Leads'],['analytics','Analytics'],['settings','Settings']];nav.innerHTML=navItems.map(([id,title])=>'<button class="nav-btn '+(page===id?'active':'')+'" data-page="'+id+'">'+title+'</button>').join('');document.querySelector('#breadcrumb').textContent=navItems.find(x=>x[0]===page)?.[1]||'Overview';const list=recent(),p=paid(),revenue=p.reduce((a,o)=>a+Number(o.total_amount||0),0);let content='';
+function render(){document.body.classList.remove('gp-boss-signin');const navItems=[['overview','Overview'],['orders','Orders'],['products','Products & Stock'],['customers','Customers'],['wishlist','Wishlist Leads'],['analytics','Analytics'],['settings','Settings']];nav.innerHTML=navItems.map(([id,title])=>'<button class="nav-btn '+(page===id?'active':'')+'" data-page="'+id+'">'+title+'</button>').join('');document.querySelector('#breadcrumb').textContent=navItems.find(x=>x[0]===page)?.[1]||'Overview';const list=recent(),p=paid(),revenue=p.reduce((a,o)=>a+Number(o.total_amount||0),0);let content='';
 if(page==='overview')content=heading('Business Overview','Live records from Galaxy Point Supabase')+'<div class="kpi-grid">'+kpi('Paid Orders',p.length)+kpi('Pending Payments',list.filter(o=>o.payment_status==='Pending').length)+kpi('Paid Revenue',money(revenue))+kpi('New Paid Orders',p.filter(o=>o.fulfillment_status==='New').length)+kpi('Products',products.length)+kpi('Customers',customers.length)+'</div><section class="panel"><div class="panel-head"><div class="panel-title">Recent Orders</div></div>'+orderRows(list.slice(0,10))+'</section>';
 if(page==='orders')content=heading('Orders Management','Real orders and fulfillment status')+'<section class="panel">'+orderRows(list)+'</section>';
 if(page==='products')content=heading('Product & Stock Overview','Inventory synchronized with the website editor')+'<section class="panel">'+productRows()+'</section>';
