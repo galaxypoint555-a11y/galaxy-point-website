@@ -15,7 +15,7 @@ alter table public.customer_login_events enable row level security;
 
 revoke all on table public.customer_login_events from anon, authenticated;
 grant insert on table public.customer_login_events to anon, authenticated;
-grant select on table public.customer_login_events to authenticated;
+grant select, delete on table public.customer_login_events to authenticated;
 
 drop policy if exists "Public can register customer login" on public.customer_login_events;
 drop policy if exists "Boss can view customer logins" on public.customer_login_events;
