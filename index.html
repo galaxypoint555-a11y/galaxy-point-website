@@ -135,6 +135,15 @@ async function gpWishlistLead(id,contact,action){
  const res=await fetch(base+'/rest/v1/wishlist_leads',{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({customer_name:contact.name,phone:contact.phone,product_id:String(p.id),product_name:p.name,action})});
  if(!res.ok)throw Error('Could not save wishlist to Galaxy Point. Please try again.');
 }
+async function gpRecordWebsiteLogin(contact){
+ const cfg=window.GP_CONFIG||{};
+ if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw Error('Customer login service unavailable');
+ const response=await fetch(cfg.supabaseUrl.replace(/\\/$/,'')+'/rest/v1/customer_login_events',{
+  method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},
+  body:JSON.stringify({customer_name:contact.name,phone:contact.phone,source:'website_login'})
+ });
+ if(!response.ok)throw Error('Unable to register website login ('+response.status+')');
+}
 function gpWishContactModal(){
  return new Promise(resolve=>{
   document.getElementById('gpWishModal')?.remove();
@@ -161,7 +170,7 @@ async function gpWishAdd(id){
  if(!contact?.name||!/^[0-9]{10}$/.test(contact.phone||'')){
   contact=await gpWishContactModal();if(!contact)return false;
  }
- try{await gpWishlistLead(id,contact,'added')}catch(e){alert(e.message);return false;}
+ try{await gpRecordWebsiteLogin(contact);await gpWishlistLead(id,contact,'added')}catch(e){alert(e.message);return false;}
  localStorage.setItem(gpWishContactKey,JSON.stringify(contact));
  gpWishlist.add(String(id));localStorage.setItem('gpWishlist',JSON.stringify([...gpWishlist]));return true;
 }
