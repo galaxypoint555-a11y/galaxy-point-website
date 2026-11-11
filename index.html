@@ -194,7 +194,7 @@ function gpBrandTiles(){const stories=[
 function gpProductTitle(p){return String(p.name||'').trim().replace(/\s*[-–—|:]?\s*(?:pre[\s-]*owned|refurbished|new)\s*$/i,'').trim()}
 function gpProductHighlights(p){
  const name=String(p.name||'').toLowerCase(),info=String(p.details||'');
- const highlights=[];
+ const configured=Array.isArray(p.highlights)?p.highlights:[];if(configured.length){const iconMap={storage:'▤',chip:'▣',rear:'▧',front:'◎',display:'▯',battery:'▰'};return configured.map(h=>'<div class="gp-highlight-row"><span class="gp-highlight-icon">'+(iconMap[h.key]||'✓')+'</span><div><span>'+gpSafe(h.title||({storage:'Storage',chip:'Processor / Chip',rear:'Rear Camera',front:'Front Camera',display:'Display',battery:'Battery'}[h.key]||'Product Highlight'))+'</span><strong>'+gpSafe(h.detail||'Specifications available on request')+'</strong></div></div>').join('')}const highlights=[];
  const storage=info.match(/\b(\d{2,4})\s*(GB|TB)\b/i);
  if(storage)highlights.push(['hard-drive','Storage',storage[1]+' '+storage[2].toUpperCase()+' storage capacity']);
  if(/iphone\s*13\b/.test(name)&&!/pro|max|mini/.test(name)){
@@ -284,7 +284,7 @@ async function gpLoadPublishedCatalog(){
   const rows=await response.json();
   if(!Array.isArray(rows))throw Error('Invalid catalog');
   // Display only real, published inventory from Supabase; never silently fall back to sample products.
-  const meta=window.gpPublishedSettings?.product_metadata||{};const nextItems=rows.map((p,i)=>({id:p.id,condition:meta[String(p.id)]?.condition||'',gallery:meta[String(p.id)]?.gallery||[],productDescription:meta[String(p.id)]?.description||'',firstMedia:meta[String(p.id)]?.firstMedia||'photo',productVideo:meta[String(p.id)]?.productVideo||'',name:p.title,brand:p.brand||p.category,category:p.category,details:[p.variant,p.description].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
+  const meta=window.gpPublishedSettings?.product_metadata||{};const nextItems=rows.map((p,i)=>({id:p.id,condition:meta[String(p.id)]?.condition||'',gallery:meta[String(p.id)]?.gallery||[],productDescription:meta[String(p.id)]?.description||'',firstMedia:meta[String(p.id)]?.firstMedia||'photo',productVideo:meta[String(p.id)]?.productVideo||'',highlights:meta[String(p.id)]?.highlights||[],name:p.title,brand:p.brand||p.category,category:p.category,details:[p.variant,p.description].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
   const nextSignature=JSON.stringify(nextItems);
   if(nextSignature!==window.gpCatalogSignature){window.gpCatalogSignature=nextSignature;items=nextItems;show();}
  }catch(err){console.warn('Galaxy Point catalog sync unavailable; hiding outdated sample products.',err);if(!window.gpCatalogSignature){items=[];show();}}
