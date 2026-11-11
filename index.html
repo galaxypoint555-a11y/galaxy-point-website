@@ -138,7 +138,7 @@ async function gpWishlistLead(id,contact,action){
 async function gpRecordWebsiteLogin(contact){
  const cfg=window.GP_CONFIG||{};
  if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw Error('Customer login service unavailable');
- const response=await fetch(cfg.supabaseUrl.replace(/\\/$/,'')+'/rest/v1/customer_login_events',{
+ const response=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/customer_login_events',{
   method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},
   body:JSON.stringify({customer_name:contact.name,phone:contact.phone,source:'website_login'})
  });
