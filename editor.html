@@ -134,4 +134,27 @@ $('reset-preview').onclick=async()=>{if(!confirm('Reload live data and discard u
   updateGreeting();
   setInterval(updateGreeting,60000);
 })();
+</script><script id="gp-channel-editors">
+(function(){
+ const sidebar=document.getElementById('sidebar');
+ const main=document.querySelector('main.workspace');
+ if(!sidebar||!main)return;
+ const nav=document.createElement('div');
+ nav.innerHTML='<div class="aside-caption">Channel Editors</div><button class="nav-item" data-nav="website-editor">🌐 Website Editor</button><button class="nav-item" data-nav="app-editor">📱 Mobile App Editor</button>';
+ sidebar.appendChild(nav);
+ const section=document.createElement('section');section.className='page';section.id='page-website-editor';
+ section.innerHTML='<div class="pagehead"><div><div class="eyebrow">Channel management</div><h1>Website Editor</h1><p>Manage website presentation separately from the mobile app. Product inventory remains shared.</p></div></div><div class="card card-pad"><h3>Website content</h3><p>Use the existing website controls for banners, homepage video, categories and shared inventory.</p><div class="quick-grid"><button class="quick-tile" data-nav="homepage">Homepage Video</button><button class="quick-tile" data-nav="banners">Banners & Offers</button><button class="quick-tile" data-nav="categories">Category Photos</button><button class="quick-tile" data-nav="products">Shared Products & Stock</button></div></div>';
+ main.appendChild(section);
+ const app=document.createElement('section');app.className='page';app.id='page-app-editor';
+ app.innerHTML='<div class="pagehead"><div><div class="eyebrow">Channel management</div><h1>Mobile App Editor</h1><p>App-only announcement; changes do not alter the website. Products, prices and stock are shared.</p></div></div><div class="card card-pad"><h3>App announcement</h3><p>Show a message on the mobile app homepage only. Leave blank to hide it.</p><label for="gp-app-announcement">Announcement text</label><textarea id="gp-app-announcement" rows="3" maxlength="220" style="display:block;width:100%;margin:12px 0;padding:12px;border:1px solid #e9edf5;border-radius:10px"></textarea><button id="gp-save-app-announcement" class="btn primary">Publish to Mobile App</button><p id="gp-app-save-status" role="status" style="margin-top:12px"></p></div><div class="card card-pad" style="margin-top:16px"><h3>Shared inventory</h3><p>Adding products or changing stock updates the website and app from the same catalog.</p><button class="btn soft" data-nav="products">Manage Products & Stock</button></div>';
+ main.appendChild(app);
+ document.querySelectorAll('[data-nav]').forEach(el=>{if(!el.closest('#page-website-editor')&&!el.closest('#page-app-editor'))return;el.addEventListener('click',()=>navigate(el.dataset.nav))});
+ nav.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>{navigate(el.dataset.nav);if(el.dataset.nav==='app-editor')loadAppSetting()}));
+ async function loadAppSetting(){try{const settings=await cloud.settings();const entry=settings.app_announcement;document.getElementById('gp-app-announcement').value=typeof entry==='string'?entry:(entry?.text||'')}catch(err){document.getElementById('gp-app-save-status').textContent='Unable to load app settings: '+err.message}}
+ document.getElementById('gp-save-app-announcement').onclick=async()=>{
+ const status=document.getElementById('gp-app-save-status');
+ try{await cloudSetting('app_announcement',document.getElementById('gp-app-announcement').value.trim());status.textContent='Published to mobile app. Changes appear on its next sync.'}
+ catch(err){status.textContent='Publish failed: '+err.message}
+ };
+})();
 </script></body></html>
