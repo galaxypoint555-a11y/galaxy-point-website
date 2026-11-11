@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "Galaxy Point Kharghar",
+  "short_name": "Galaxy Point",
+  "description": "Shop new and pre-owned phones, accessories and more at Galaxy Point Kharghar.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf7f2",
+  "theme_color": "#302018",
+  "icons": [
+    {
+      "src": "./pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
