@@ -163,6 +163,14 @@ body.gp-menu-open{overflow:hidden}
 @keyframes gpCaptionFloatIn{from{opacity:0;translate:0 16px;filter:blur(5px)}to{opacity:1;translate:0 0;filter:blur(0)}}
 @media(max-width:750px){.gp-customer-story .gp-crowd-caption{top:12px!important;padding:10px 12px!important;max-width:calc(100% - 20px)!important}.gp-customer-story .gp-crowd-caption .eyebrow{font-size:8px!important;letter-spacing:.08em!important}.gp-customer-story .gp-crowd-caption h2{font-size:clamp(15px,3.7vw,20px)!important}}
 @media(prefers-reduced-motion:reduce){.gp-customer-story .gp-crowd-caption{opacity:1!important;filter:none!important;animation:none!important;transition:none!important}}
+</style><style id="gp-instant-hero-video-v7">
+/* Show real storefront image instantly until the first video frame is ready */
+.hero-video-layer>.photo-tile{visibility:visible!important;opacity:1!important;z-index:1!important;animation:shopZoom 16s alternate infinite ease-in-out!important}
+.hero.video-ready .hero-video-layer>.photo-tile{opacity:0!important;transition:opacity .65s ease!important}
+.hero-video-layer video{z-index:2!important;opacity:0!important;transform:none!important;filter:none!important;transition:opacity .65s ease!important}
+.hero.video-ready .hero-video-layer video{opacity:1!important;animation:gpHeroFirstFrame .7s ease both!important}
+@keyframes gpHeroFirstFrame{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.hero.video-ready .hero-video-layer video{animation:none!important;opacity:1!important}}
 </style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
 <header class="nav"><button class="mobile-menu" id="menuBtn" aria-label="Menu">☰</button><div class="logo" data-page="home">GALAXY POINT<b>KHARGHAR</b></div><div class="navlinks"><button data-page="home">HOME</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-cat="Pre-Owned">PRE-OWNED</button><button data-cat="New Phone">NEW PHONE</button><button data-page="track">TRACK ORDER</button><button data-page="support">CONTACT US</button></div><button class="bag" data-page="cart" aria-label="View shopping bag"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8.5h15l-1 12h-13l-1-12Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg> <span id="bagCount">0</span></button></header><div class="gp-drawer-backdrop" id="gpDrawerBackdrop"></div><nav class="menu-pop" id="menuPop" aria-label="Main menu"><button class="gp-drawer-close" id="gpDrawerClose" aria-label="Close menu">×</button><button data-page="home">HOME</button><button data-page="wishlist">WISHLIST ♡</button><button data-page="track">MY ORDER</button><button data-page="track">TRACK ORDER</button><button data-page="about">ABOUT STORE</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-page="support">CONTACT SERVICE CENTRE</button></nav>
 <main id="view"></main><button class="chat" id="chatBtn" aria-label="Store contact">☏</button>
@@ -300,7 +308,7 @@ function setupStoreVideo(){
  v.setAttribute('muted','');v.setAttribute('playsinline','');
  const play=()=>{if(!v.isConnected)return;const promise=v.play();if(promise?.catch)promise.catch(()=>{})};
  v.addEventListener('playing',()=>{hero.classList.add('video-ready');hero.classList.add('gp-video-enter')},{once:true});
- v.addEventListener('loadeddata',()=>{hero.classList.add('video-ready');play()},{once:true});
+ v.addEventListener('loadeddata',()=>{play()},{once:true});
  if(/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source)){v.src=source;v.load();play()}
  else if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=source;v.load();play()}
  else{
@@ -352,6 +360,8 @@ async function gpLoadPublishedCatalog(){
  }catch(err){console.warn('Galaxy Point catalog sync unavailable; hiding outdated sample products.',err);if(!window.gpCatalogSignature){items=[];show();}}
 }
 gpLoadPublishedCatalog();
+// Use the last successfully published hero video immediately while fresh CMS settings load.
+try{const cached=localStorage.getItem('gp_cached_hero_video_url');if(cached&&/^https:\/\//i.test(cached)){window.gpPublishedSettings={...(window.gpPublishedSettings||{}),hero_video_url:cached};window.gpVideoSettingsLoaded=true;setupStoreVideo()}}catch(_e){}
 
 async function gpLoadSiteSettings(){
  try{
@@ -364,6 +374,7 @@ async function gpLoadSiteSettings(){
   const settingsChanged=settingsSignature!==window.gpSettingsSignature;
   window.gpSettingsSignature=settingsSignature;
   window.gpPublishedSettings=settings;
+  try{if(typeof settings.hero_video_url==='string'&&/^https:\/\//i.test(settings.hero_video_url))localStorage.setItem('gp_cached_hero_video_url',settings.hero_video_url)}catch(_e){}
   if(settings.category_images&&typeof settings.category_images==='object'){
    for(const name of ['iPhone','Samsung','Laptops']){
     const url=settings.category_images[name];
