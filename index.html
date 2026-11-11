@@ -112,7 +112,7 @@ body.gp-menu-open{overflow:hidden}
 @media(max-width:540px){.gp-wish-overlay{align-items:center;padding:12px}.gp-wish-dialog{padding:30px 23px 23px}.gp-wish-dialog h2{font-size:34px}.gp-wish-sub{font-size:12px;margin-bottom:19px}.gp-wish-dialog input{padding:13px 12px}}
 </style><style id="gp-premium-product-css">
 .gp-gallery{min-width:0;overflow:hidden}.gp-gallery-viewport{width:100%;overflow:hidden;background:#f8f7f5;touch-action:pan-y;cursor:grab;border-radius:16px}.gp-gallery-track{display:flex;transition:transform .72s cubic-bezier(.22,1,.36,1);will-change:transform}.gp-gallery-slide{flex:0 0 100%;min-width:0;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}.gp-gallery-slide img{width:100%;height:100%;object-fit:contain;transition:transform 1s}.gp-gallery-slide:hover img{transform:scale(1.035)}.gp-gallery-dots{display:flex;justify-content:center;gap:8px;padding:16px}.gp-gallery-dot{border:0;border-radius:50px;width:7px;height:7px;background:#d7d0c8;padding:0;transition:all .35s}.gp-gallery-dot.active{width:25px;background:#8d6b51}.gp-premium-detail .gp-detail-info h1{font-family:Georgia,serif;line-height:1.17;letter-spacing:-.025em}.gp-detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.gp-condition-pill{font:600 10px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;background:#f3eee8;color:#795c46;border-radius:40px;padding:8px 11px}.gp-assured,.gp-emi{border:1px solid #e5ded5;border-radius:13px;padding:17px;margin:18px 0;display:grid;gap:8px;background:#faf8f5}.gp-assured strong{color:#2f725b;letter-spacing:.07em}.gp-emi{background:#f7f8fa}.gp-emi strong{color:#302018}.gp-assured span,.gp-emi span{color:#756d65;font-size:12px;line-height:1.65}.gp-premium-detail details p{line-height:1.8}.gp-premium-detail .gp-detail-image{overflow:hidden}@media(max-width:750px){.gp-gallery-viewport{border-radius:8px}.gp-gallery-slide{aspect-ratio:1/1}.gp-premium-detail .gp-detail-info h1{font-size:clamp(28px,7vw,39px)}}@media(prefers-reduced-motion:reduce){.gp-gallery-track,.gp-gallery-slide img{transition:none}}
-</style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
+</style><style id="gp-video-loading-fix">.hero-video-layer{background:linear-gradient(135deg,#211a19,#44352d 55%,#1c1717)}.hero-video-layer>.photo-tile{visibility:hidden!important}.hero-video-layer video{display:block!important;opacity:0;transition:opacity 1.15s cubic-bezier(.2,.8,.2,1);transform:scale(1.035);filter:saturate(1.04)}.hero.video-ready .hero-video-layer video{opacity:1;animation:gpVideoReveal 1.5s cubic-bezier(.2,.8,.2,1) both}.hero-caption{animation:gpHeroCaption 1.1s ease both}@keyframes gpVideoReveal{from{opacity:0;transform:scale(1.075);filter:blur(7px)}to{opacity:1;transform:scale(1.035);filter:blur(0)}}@keyframes gpHeroCaption{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.hero-video-layer video,.hero-caption{animation:none!important;transition:none!important}}</style></head><body><div class="topline">GALAXY POINT KHARGHAR • PREMIUM DEVICES • TRUSTED DEALS</div><div class="notice">PREMIUM DEVICES · TRUSTED SERVICE · KHARGHAR</div>
 <header class="nav"><button class="mobile-menu" id="menuBtn" aria-label="Menu">☰</button><div class="logo" data-page="home">GALAXY POINT<b>KHARGHAR</b></div><div class="navlinks"><button data-page="home">HOME</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-cat="Pre-Owned">PRE-OWNED</button><button data-cat="New Phone">NEW PHONE</button><button data-page="track">TRACK ORDER</button><button data-page="support">CONTACT US</button></div><button class="bag" data-page="cart" aria-label="View shopping bag"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8.5h15l-1 12h-13l-1-12Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg> <span id="bagCount">0</span></button></header><div class="gp-drawer-backdrop" id="gpDrawerBackdrop"></div><nav class="menu-pop" id="menuPop" aria-label="Main menu"><button class="gp-drawer-close" id="gpDrawerClose" aria-label="Close menu">×</button><button data-page="home">HOME</button><button data-page="wishlist">WISHLIST ♡</button><button data-page="track">MY ORDER</button><button data-page="track">TRACK ORDER</button><button data-page="about">ABOUT STORE</button><button data-cat="Premium Accessories">ACCESSORIES</button><button data-page="support">CONTACT SERVICE CENTRE</button></nav>
 <main id="view"></main><button class="chat" id="chatBtn" aria-label="Store contact">☏</button>
 <script src="gp-config.js?v=20261110-mobile-live-2"></script><script>
@@ -221,77 +221,23 @@ let gpGalleryAbort=new AbortController();function show(){gpGalleryAbort.abort();
 function setupReveals(){const nodes=[...document.querySelectorAll(".reveal")];if(!("IntersectionObserver" in window)){nodes.forEach(n=>n.classList.add("in-view"));return}const observer=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target)}})},{threshold:.06,rootMargin:"0px 0px 25px 0px"});nodes.forEach(n=>observer.observe(n))}
 
 function setupStoreVideo(){
- if(window.gpRunningHls && typeof window.gpRunningHls.destroy==="function"){window.gpRunningHls.destroy();window.gpRunningHls=null;}
- const v=document.getElementById("gpStoreVideo");
- if(!v)return;
- const hero=v.closest(".hero");
- if(!window.gpVideoSettingsLoaded)return;
- const gpPlaylist=["gp-happy-diwali.mp4","gp-new-stock.mp4"];
- const gpStartPlaylist=async()=>{
-   const available=await Promise.all(gpPlaylist.map(async url=>{try{const response=await fetch(url,{method:"HEAD",cache:"no-store"});return response.ok}catch{return false}}));
-   if(!v.isConnected||!available.every(Boolean))return false;
-   if(window.gpRunningHls&&typeof window.gpRunningHls.destroy==="function"){window.gpRunningHls.destroy();window.gpRunningHls=null}
-   let index=0;
-   v.loop=false;v.muted=true;v.defaultMuted=true;v.playsInline=true;
-   v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("autoplay","");
-   v.removeAttribute("loop");
-   const next=()=>{if(!v.isConnected)return;v.src=gpPlaylist[index];v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{})};
-   v.addEventListener("ended",()=>{index=(index+1)%gpPlaylist.length;next()});
-   v.addEventListener("playing",()=>hero.classList.add("video-ready"));
-   document.addEventListener("visibilitychange",()=>{if(!document.hidden&&v.isConnected&&v.paused){const p=v.play();if(p&&p.catch)p.catch(()=>{})}});
-   next();return true;
- };
- const playlistReady=gpStartPlaylist();
- const configuredVideo=window.gpPublishedSettings?.hero_video_url;
- const source=(typeof configuredVideo==="string"&&/^https:\/\//i.test(configuredVideo))?configuredVideo:"";
- const directVideo=/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source);
- v.muted=true;v.defaultMuted=true;v.autoplay=true;v.playsInline=true;v.loop=true;
- v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");v.setAttribute("autoplay","");
- const playback=()=>{
-   if(!v.isConnected)return;
-   const result=v.play();
-   if(result&&typeof result.catch==="function")result.catch(()=>{ /* Autoplay may be restricted by the browser; retain poster without intrusive overlay. */ });
- };
- v.addEventListener("playing",()=>{hero.classList.add("video-ready")});
- v.addEventListener("pause",()=>{if(!document.hidden&&v.isConnected&&v.currentTime>0)playback()});
- 
- playlistReady.then(ready=>{if(ready||!source)return;
- if(directVideo){v.src=source;v.load();playback();}
- else if(v.canPlayType("application/vnd.apple.mpegurl")||v.canPlayType("application/x-mpegURL")){
-   v.src=source;v.load();playback();
- } else {
-   const startHls=()=>{
-     if(!v.isConnected)return;
-     if(window.Hls&&window.Hls.isSupported()){
-       const h=new window.Hls({enableWorker:true,startLevel:-1,lowLatencyMode:false,maxBufferLength:20});
-       window.gpRunningHls=h;h.loadSource(source);h.attachMedia(v);
-       h.on(window.Hls.Events.MANIFEST_PARSED,playback);
-       h.on(window.Hls.Events.ERROR,(_,data)=>{
-         if(!data||!data.fatal)return;
-         if(data.type===window.Hls.ErrorTypes.NETWORK_ERROR)h.startLoad();
-         else if(data.type===window.Hls.ErrorTypes.MEDIA_ERROR)h.recoverMediaError();
-         else { /* Keep hero poster visible on playback failure. */ }
-       });
-     }else{ /* HLS not supported; keep hero image. */ }
-   };
-   if(window.Hls)startHls();else{
-     const script=document.createElement("script");
-     script.src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
-     script.async=true;script.onload=startHls;
-     script.onerror=()=>{ /* Keep hero image if player library is unavailable. */ };
-     document.head.appendChild(script);
-   }
+ const v=document.getElementById('gpStoreVideo');if(!v)return;
+ const hero=v.closest('.hero');
+ const source=window.gpPublishedSettings?.hero_video_url;
+ if(!window.gpVideoSettingsLoaded||typeof source!=='string'||!/^https:\/\//i.test(source))return;
+ if(window.gpRunningHls?.destroy){window.gpRunningHls.destroy();window.gpRunningHls=null}
+ v.muted=true;v.defaultMuted=true;v.playsInline=true;v.loop=true;v.autoplay=true;
+ v.setAttribute('muted','');v.setAttribute('playsinline','');
+ const play=()=>{if(!v.isConnected)return;const promise=v.play();if(promise?.catch)promise.catch(()=>{})};
+ v.addEventListener('playing',()=>{hero.classList.add('video-ready');hero.classList.add('gp-video-enter')},{once:true});
+ v.addEventListener('loadeddata',()=>{hero.classList.add('video-ready');play()},{once:true});
+ if(/\.(mp4|webm|mov)(?:[?#]|$)/i.test(source)){v.src=source;v.load();play()}
+ else if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=source;v.load();play()}
+ else{
+ const start=()=>{if(!v.isConnected)return;if(window.Hls?.isSupported()){const h=new window.Hls({enableWorker:true});window.gpRunningHls=h;h.loadSource(source);h.attachMedia(v);h.on(window.Hls.Events.MANIFEST_PARSED,play)}};
+ if(window.Hls)start();else{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js';script.onload=start;document.head.appendChild(script)}
  }
- });
- if(!window.gpVideoVisibilityBound){
-   window.gpVideoVisibilityBound=true;
-   document.addEventListener("visibilitychange",()=>{
-     if(!document.hidden){
-       const active=document.getElementById("gpStoreVideo");
-       if(active&&active.paused){const p=active.play();if(p&&p.catch)p.catch(()=>{})}
-     }
-   });
- }
+ if(!window.gpVideoVisibilityBound){window.gpVideoVisibilityBound=true;document.addEventListener('visibilitychange',()=>{const active=document.getElementById('gpStoreVideo');if(!document.hidden&&active?.paused)active.play().catch(()=>{})})}
 }
 setInterval(()=>{const slides=[...document.querySelectorAll(".hero-slide")],dots=[...document.querySelectorAll(".hero-dots span")];if(slides.length<2)return;const active=slides.findIndex(s=>s.classList.contains("active"));slides.forEach((s,i)=>s.classList.toggle("active",i===(active+1)%slides.length));dots.forEach((s,i)=>s.classList.toggle("active",i===(active+1)%dots.length))},4700);
 
@@ -344,7 +290,7 @@ async function gpLoadSiteSettings(){
    }
   }
   window.gpVideoSettingsLoaded=true;
-  if(settingsChanged){await gpLoadPublishedCatalog();if(page==='home'||page==='product')show();}
+  if(settingsChanged){await gpLoadPublishedCatalog();if(page==='home'&&window.gpRenderedHeroVideo!==settings.hero_video_url){window.gpRenderedHeroVideo=settings.hero_video_url;show();}else if(page==='product')show();}
   else if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;show();}
  }catch(err){console.warn('Galaxy Point site settings unavailable',err);window.gpVideoSettingsLoaded=true;if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;show();}}
 }
