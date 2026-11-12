@@ -59,11 +59,11 @@
     function sync(){
       const active=selectedStorages.size>0&&selectedColors.size>0;
       price.readOnly=active;stock.readOnly=active;
-      if(active){const vals=[...selectedStorages].map(s=>storageData[s]).filter(x=>x?.price>0);if(vals.length){price.value=Math.min(...vals.map(x=>x.price));stock.value=[...selectedStorages].reduce((n,s)=>n+(storageData[s]?.stock||0),0)}}
+      if(active){const vals=[...selectedStorages].map(s=>storageData[s]).filter(x=>x?.price>0);if(vals.length){price.value=Math.min(...vals.map(x=>x.price));stock.value=[...selectedStorages].reduce((n,s)=>n+(storageData[s]?.stock||0)*selectedColors.size,0)}}
       host.querySelector('#gp-v-summary').textContent=selectedStorages.size+' storage sizes · '+selectedColors.size+' colours selected · Only selected options appear publicly';
     }
     function render(){
-      storageHost.innerHTML=allStorages.map(s=>'<div class="gp-v-storage-card '+(selectedStorages.has(s)?'selected':'')+'"><label class="gp-v-storage-head"><input type="checkbox" data-storage-toggle="'+esc(s)+'" '+(selectedStorages.has(s)?'checked':'')+'><strong>'+esc(s)+'</strong></label><div class="gp-v-price-stock"><label>Price ₹<input type="number" min="1" step="1" data-storage-price="'+esc(s)+'" placeholder="31999" value="'+(storageData[s]?.price||'')+'" '+(!selectedStorages.has(s)?'disabled':'')+'></label><label>Stock<input type="number" min="0" step="1" data-storage-stock="'+esc(s)+'" value="'+(storageData[s]?.stock||0)+'" '+(!selectedStorages.has(s)?'disabled':'')+'></label></div></div>').join('');
+      storageHost.innerHTML=allStorages.map(s=>'<div class="gp-v-storage-card '+(selectedStorages.has(s)?'selected':'')+'"><label class="gp-v-storage-head"><input type="checkbox" data-storage-toggle="'+esc(s)+'" '+(selectedStorages.has(s)?'checked':'')+'><strong>'+esc(s)+'</strong></label><div class="gp-v-price-stock"><label>Price ₹<input type="number" min="1" step="1" data-storage-price="'+esc(s)+'" placeholder="31999" value="'+(storageData[s]?.price||'')+'" '+(!selectedStorages.has(s)?'disabled':'')+'></label><label>Stock / colour<input type="number" min="0" step="1" data-storage-stock="'+esc(s)+'" value="'+(storageData[s]?.stock||0)+'" '+(!selectedStorages.has(s)?'disabled':'')+'></label></div></div>').join('');
       colorHost.innerHTML=allColors.map(c=>'<label class="gp-v-color-item '+(selectedColors.has(c)?'selected':'')+'"><input type="checkbox" data-color-toggle="'+esc(c)+'" '+(selectedColors.has(c)?'checked':'')+'><span class="gp-v-color-dot" style="background:'+colorHex(c)+'"></span><span>'+esc(c)+'</span></label>').join('');
       sync();
     }
@@ -74,7 +74,7 @@
     form.gpReadVariantOptions=()=>{
       if(!selectedStorages.size&&!selectedColors.size)return [];
       if(!selectedStorages.size||!selectedColors.size)throw Error('Select at least one storage size and one colour.');
-      const options=[];for(const s of selectedStorages){const d=storageData[s];if(!Number.isInteger(d.price)||d.price<=0)throw Error('Enter a valid price for '+s);if(!Number.isInteger(d.stock)||d.stock<0)throw Error('Enter valid stock for '+s);const cs=[...selectedColors];for(let i=0;i<cs.length;i++)options.push({storage:s,color:cs[i],price:d.price,stock:i===0?d.stock:0})}
+      const options=[];for(const s of selectedStorages){const d=storageData[s];if(!Number.isInteger(d.price)||d.price<=0)throw Error('Enter a valid price for '+s);if(!Number.isInteger(d.stock)||d.stock<0)throw Error('Enter valid stock for '+s);const cs=[...selectedColors];for(let i=0;i<cs.length;i++)options.push({storage:s,color:cs[i],price:d.price,stock:d.stock})}
       if(options.length>200)throw Error('Maximum 200 combinations.');return sane(options);
     };
     render();
