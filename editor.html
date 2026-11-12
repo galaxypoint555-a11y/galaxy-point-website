@@ -143,9 +143,46 @@ const gpOCRPatterns={
  battery:[/(?:battery|capacity)\s*[:\-]?\s*(\d{3,5}\s*mah(?:\s*[^\n]{0,50})?)/i,/\b(\d{3,5}\s*mah)\b/i]
 };
 function gpOCRExtract(text){
- const lines=text.replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(Boolean);const result={};
+ const lines=text.replace(/\r/g,'').split('\n').map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+ const result={},used=new Set();
+ const rules=[
+  ['storage',/(?:\b\d+\s*(?:gb|tb)\b.*\b(?:rom|storage|memory)\b|\b(?:rom|storage|memory)\b.*\b\d+\s*(?:gb|tb)\b)/i],
+  ['chip',/(?:\b(?:a\d{2,3}|bionic|snapdragon|dimensity|exynos|tensor)\b|processor|chipset|chip\b|hexa\s*core)/i],
+  ['rear',/(?:rear|back|main|primary)\s*camera|(?:\d+\s*mp\s*\+\s*\d+\s*mp)/i],
+  ['front',/(?:front|selfie)\s*camera/i],
+  ['display',/(?:display|screen|retina|amoled|oled)\b/i],
+  ['battery',/(?:battery|mAh)\b/i]
+ ];
+ const isTitle=(line)=>rules.some(([,rx])=>rx.test(line));
+ const isDescription=(line)=>line.length>=8&&!isTitle(line)&&!(/^(?:product highlights|highlights|specifications|features|show more|view details)$/i).test(line);
+ for(const [key,pattern] of rules){
+  for(let i=0;i<lines.length;i++){
+   const line=lines[i];if(used.has(i)||!pattern.test(line))continue;
+   if(key==='rear'&&/(?:front|selfie)/i.test(line))continue;
+   if(key==='front'&&/(?:rear|back)/i.test(line))continue;
+   if(key==='battery'&&/capacity/i.test(line)&&!/\bmah\b/i.test(line))continue;
+   if(line.length>115)continue;
+   let title=line.replace(/^[•\-–:.,\s]+/,'').replace(/[|;,. ]+$/,'').trim();
+   if(title.length<3)continue;
+   let detail='';
+   for(let j=i+1;j<Math.min(i+3,lines.length);j++){
+    if(used.has(j)||isTitle(lines[j]))break;
+    if(isDescription(lines[j])){detail=lines[j].slice(0,180);used.add(j);break}
+   }
+   result[key]={title:title.slice(0,110),detail};used.add(i);break;
+  }
+ }
+ // Fallback for images with non-standard label ordering.
  for(const [key,patterns] of Object.entries(gpOCRPatterns)){
-  for(const line of lines){for(const regex of patterns){const match=line.match(regex);if(match){let value=match[1].replace(/\s+/g,' ').trim().replace(/[|;,. ]+$/,'');if(value.length>=2&&value.length<=110){result[key]=value;break}}}if(result[key])break}
+  if(result[key])continue;
+  for(let i=0;i<lines.length;i++){if(used.has(i))continue;
+   for(const regex of patterns){const m=lines[i].match(regex);if(!m)continue;
+    const title=m[1].replace(/\s+/g,' ').trim().replace(/[|;,. ]+$/,'');
+    if(title.length<3||title.length>110||/^(?:camera|processor|display)$/i.test(title))continue;
+    const detail=lines[i+1]&&!isTitle(lines[i+1])&&isDescription(lines[i+1])?lines[i+1].slice(0,180):'';
+    result[key]={title,detail};used.add(i);break;
+   }if(result[key])break;
+  }
  }
  return result;
 }
@@ -164,9 +201,9 @@ async function gpOCRProcess(file){
   gpOCRStatus.textContent=matches.length+' specification(s) detected. Review suggestions below.';
   gpOCRReview.hidden=false;gpOCRReview.replaceChildren();
   const heading=document.createElement('strong');heading.textContent='Detected highlights · select what to apply';gpOCRReview.appendChild(heading);
-  for(const [key,value] of matches){const row=document.createElement('label');row.className='gp-ocr-result';const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;cb.dataset.key=key;cb.dataset.value=value;const label=document.createElement('span');label.textContent=key.toUpperCase()+' · '+value;row.append(cb,label);gpOCRReview.appendChild(row)}
+  for(const [key,value] of matches){const row=document.createElement('label');row.className='gp-ocr-result';const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;cb.dataset.key=key;cb.dataset.value=value.title;cb.dataset.detail=value.detail||'';const label=document.createElement('span');label.textContent=key.toUpperCase()+' · '+value.title+(value.detail?'  ↳ '+value.detail:'');row.append(cb,label);gpOCRReview.appendChild(row)}
   const apply=document.createElement('button');apply.type='button';apply.className='btn primary sm';apply.textContent='Apply Selected Highlights';apply.onclick=()=>{
-   let count=0;for(const cb of gpOCRReview.querySelectorAll('input:checked')){const field=form.elements['highlight_'+cb.dataset.key+'_title'];if(field){field.value=cb.dataset.value;count++}}
+   let count=0;for(const cb of gpOCRReview.querySelectorAll('input:checked')){const field=form.elements['highlight_'+cb.dataset.key+'_title'];if(field){field.value=cb.dataset.value;const detailField=form.elements['highlight_'+cb.dataset.key+'_detail'];if(detailField&&cb.dataset.detail)detailField.value=cb.dataset.detail;count++}}
    gpOCRStatus.textContent=count+' highlights filled. Please verify details before saving.';toast(count+' highlights applied. Review before saving.');
   };gpOCRReview.appendChild(apply);
  }catch(err){gpOCRStatus.textContent='Could not read image: '+err.message}
