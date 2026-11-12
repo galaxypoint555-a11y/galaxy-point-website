@@ -7,8 +7,27 @@ window.GPCloud=(()=>{
   function requireConfig(){if(!configured())throw Error('Cloud database is not configured. Set the Supabase Project URL and publishable key in gp-config.js.');}
   const base=()=>{requireConfig();return cfg.supabaseUrl.replace(/\/$/,'');};
   function headers(auth=true,extra={}){const h={apikey:cfg.supabaseAnonKey,'Content-Type':'application/json',...extra};h.Authorization='Bearer '+(auth&&session?.access_token?session.access_token:cfg.supabaseAnonKey);return h;}
+  let refreshPromise=null;
+  async function renewSession(){
+    if(!session?.refresh_token)throw Error('Session expired. Please sign in again.');
+    if(!refreshPromise)refreshPromise=(async()=>{
+      const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:headers(false),body:JSON.stringify({refresh_token:session.refresh_token})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data.access_token)throw Error('Session expired. Please sign in again.');
+      saveSession({...data,expires_at:Math.floor(Date.now()/1000)+data.expires_in});
+    })().finally(()=>{refreshPromise=null});
+    return refreshPromise;
+  }
   async function request(path,{method='GET',body,auth=true,extra={},raw=false}={}){
-    const res=await fetch(base()+path,{method,headers:headers(auth,extra),body:body===undefined?undefined:(raw?body:JSON.stringify(body))});
+    const isAuthEndpoint=path.startsWith('/auth/v1/token');
+    if(auth&&!isAuthEndpoint&&session?.access_token&&session.expires_at&&session.expires_at<=Math.floor(Date.now()/1000)+120){
+      try{await renewSession()}catch(e){saveSession(null);throw e}
+    }
+    const send=()=>fetch(base()+path,{method,headers:headers(auth,extra),body:body===undefined?undefined:(raw?body:JSON.stringify(body))});
+    let res=await send();
+    if(auth&&!isAuthEndpoint&&res.status===401&&session?.refresh_token){
+      try{await renewSession();res=await send()}catch(e){saveSession(null);throw e}
+    }
     const txt=await res.text();let data=null;try{data=txt?JSON.parse(txt):null;}catch{data=txt;}
     if(!res.ok)throw Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+res.status+')');
     return data;
