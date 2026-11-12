@@ -221,15 +221,49 @@ $('gp-ocr-paste').addEventListener('click',()=>$('gp-ocr-paste').focus());
 $('gp-generate-description').addEventListener('click',()=>{
  const name=String(form.elements.name.value||'').trim();
  if(!name){toast('Enter the product name first.');form.elements.name.focus();return}
- const storage=gpSelectedVariant();
- const color=String(form.elements.color.value||'').trim();
- const condition=String(form.elements.condition.value||'').trim();
+ const storage=gpSelectedVariant(),color=String(form.elements.color.value||'').trim();
  const warranty=String(form.elements.warranty.value||'').trim();
+ const condition=String(form.elements.condition.value||'').trim();
  const existing=String(form.elements.productDescription.value||'').trim();
  if(existing&&!confirm('Replace the current product description with a new draft?'))return;
- const parts=[name+' is available at Galaxy Point Kharghar.',storage?'Variant: '+storage+'.':'',color?'Colour: '+color+'.':'',condition?'Condition: '+condition+'.':'',warranty?'Warranty: '+warranty+'.':'','Explore this device at Galaxy Point Kharghar. Contact our team for availability, a detailed condition check and purchase assistance.'];
- form.elements.productDescription.value=parts.filter(Boolean).join('\\n\\n').replace(/\\\\n/g,'\\n');
- toast('Description draft generated. Review before saving.');
+ const highlights={};
+ for(const key of ['storage','chip','rear','front','display','battery']){
+  highlights[key]={title:String(form.elements['highlight_'+key+'_title']?.value||'').trim(),detail:String(form.elements['highlight_'+key+'_detail']?.value||'').trim()};
+ }
+ const iphone=name.match(/\biPhone\s*(\d{1,2})\s*(Pro\s*Max|Pro|Plus|Mini)?\b/i);
+ const modelNumber=iphone?Number(iphone[1]):0;
+ const tier=iphone?(iphone[2]||'').trim().toLowerCase():'';
+ const isIphone=Boolean(iphone);
+ const points=[],seen=new Set();
+ const add=x=>{x=String(x||'').trim();if(x&&!seen.has(x.toLowerCase())){points.push(x);seen.add(x.toLowerCase())}};
+ const display=highlights.display.title,chip=highlights.chip.title,rear=highlights.rear.title,front=highlights.front.title,battery=highlights.battery.title;
+ const intro=[name+' brings together thoughtful design and everyday smartphone functionality.'];
+ if(chip)intro.push('Powered by the '+chip+', it is designed for responsive everyday use and multitasking.');
+ if(display)intro.push('Enjoy content on its '+display+'.');
+ if(rear)intro.push('Capture photos and videos with the '+rear+'.');
+ if(!chip&&!display&&!rear)intro.push('Explore its display, camera experience, performance and features to find the right device for your needs.');
+ const opening=intro.join(' ');
+ add(storage?'Storage Variant: '+storage:'');
+ add(color?'Colour: '+color:'');
+ add(chip?chip:'');
+ add(display?display:'');
+ add(rear?rear:'');
+ add(front?front:'');
+ add(battery?battery:'');
+ if(isIphone){
+  add('Apple iOS Experience');
+  if(modelNumber>=11)add('Face ID Facial Recognition');
+  if(modelNumber>=12)add('5G Connectivity');
+  if(modelNumber>=12)add('MagSafe Wireless Charging Support');
+  if(tier.includes('pro'))add('Pro Series Camera Features');
+  if(modelNumber>=15||modelNumber===14&&tier.includes('pro'))add('Dynamic Island');
+ }
+ for(const key of ['chip','display','rear','front','battery'])if(highlights[key].detail)add(highlights[key].detail);
+ if(condition)add('Condition: '+condition);
+ if(warranty)add(warranty);
+ const result=opening+'\n\n'+points.map(x=>'✅ '+x).join('\n');
+ form.elements.productDescription.value=result;
+ toast('Phone-focused description generated. Review details before saving.');
 });
 gpRenderMedia();
 $('gp-product-video').addEventListener('change',()=>{const f=$('gp-product-video').files[0],box=$('gp-video-preview');if(!f)return;const url=URL.createObjectURL(f);box.innerHTML='';const video=document.createElement('video');video.src=url;video.controls=true;video.muted=true;video.playsInline=true;video.style='max-width:230px;width:100%;border-radius:12px';box.appendChild(video);});form.addEventListener('submit',async e=>{e.preventDefault();const data=new FormData(form);let obj={id:p?.id||uid(),name:String(data.get('name')).trim(),category:data.get('category'),storage:gpSelectedVariant(),condition:data.get('condition'),price:Number(data.get('price')),stock:Number(data.get('stock')),visible:data.get('visible')==='on',warranty:String(data.get('warranty')||'').trim(),productDescription:String(data.get('productDescription')||'').trim()};if(!obj.name||!Number.isInteger(obj.price)||obj.price<0||!Number.isInteger(obj.stock)||obj.stock<0){toast('Please enter valid product name, price and stock.');return}const submitButton=form.querySelector('button[type="submit"]');submitButton.disabled=true;submitButton.textContent='Saving to cloud…';const image=gpCoverFile;try{if(image)obj.image_url=await cloud.upload(image,'catalog');else obj.image_url=gpExistingCover;const result=await cloud.upsertProduct(cloudProduct(obj),p?.id);const productId=String(p?.id||result?.[0]?.id||'');const dealId=productId;if(!dealId&&data.get('daily_deal')==='on')throw Error('Product saved, but Deal of the Day ID could not be resolved. Reopen Edit Product and tick again.');if(productId){const files=gpGalleryFiles;const gallery=[...gpExistingGallery,...await Promise.all(files.map(f=>cloud.upload(f,'catalog')))];let productVideo=data.get('removeVideo')==='on'?'':(p?.productVideo||'');const videoFile=$('gp-product-video').files[0];if(videoFile){if(!/^video\/(mp4|webm|quicktime)$/.test(videoFile.type))throw Error('Please choose MP4, WebM or MOV video.');productVideo=await cloud.upload(videoFile,'catalog');}const current=cloudMedia.product_metadata||{};const metadata={...current,[productId]:{...current[productId],condition:obj.condition,marketPrice:Number(data.get('marketPrice'))||0,color:String(data.get('color')||'').trim(),description:obj.productDescription,gallery,firstMedia:data.get('firstMedia')==='video'?'video':'photo',productVideo,highlights:['storage','chip','rear','front','display','battery'].map(key=>({key,title:String(data.get('highlight_'+key+'_title')||'').trim(),detail:String(data.get('highlight_'+key+'_detail')||'').trim()}))}};const next=new Set(dealIds);if(data.get('daily_deal')==='on')next.add(dealId);else next.delete(dealId);await cloud.saveSettings({product_metadata:metadata,deal_of_day_ids:[...next]});cloudMedia.product_metadata=metadata;dealIds=[...next];}await refreshCloud();log((p?'Updated ':'Added ')+obj.name);closeModal();toast('Product saved to live website.')}catch(err){toast('Save failed: '+err.message)}finally{if(form.isConnected){submitButton.disabled=false;submitButton.textContent=p?'Save Changes':'Add Product'}}});$('cancel-modal').onclick=closeModal;if(p)$('delete-current-product').onclick=async()=>{if(!confirm('Permanently delete '+p.name+' from the live website?'))return;try{await cloud.removeProduct(p.id);await refreshCloud();log('Deleted '+p.name);closeModal();toast('Product deleted from live inventory.')}catch(err){toast('Delete failed: '+err.message)}}}
