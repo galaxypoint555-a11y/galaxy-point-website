@@ -404,7 +404,7 @@ async function gpLoadPublishedCatalog(){
 }
 gpLoadPublishedCatalog();
 
-function gpRefreshFeaturedDeals(){if(page!=='home')return;const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\\'':'&#39;'}[c]));const daily=document.querySelector('.gp-deal-grid:not(.gp-price-grid)'),price=document.querySelector('.gp-price-grid');if(daily){const html=gpDailyDeals(esc);if(daily.innerHTML!==html)daily.innerHTML=html}if(price){const html=gpPriceDropProducts(esc);if(price.innerHTML!==html)price.innerHTML=html}}
+function gpRefreshFeaturedDeals(){if(page!=='home')return;const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', [String.fromCharCode(39)]:'&#39;'}[c]));const daily=document.querySelector('.gp-deal-grid:not(.gp-price-grid)'),price=document.querySelector('.gp-price-grid');if(daily){const html=gpDailyDeals(esc);if(daily.innerHTML!==html)daily.innerHTML=html}if(price){const html=gpPriceDropProducts(esc);if(price.innerHTML!==html)price.innerHTML=html}}
 async function gpLoadSiteSettings(){
  try{
   const cfg=window.GP_CONFIG;if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey)return;
