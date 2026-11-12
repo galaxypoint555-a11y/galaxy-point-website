@@ -37,60 +37,51 @@
     if(parts.length===3&&!variant)return null;
     return {p,variant,key:k,price:variant?variant.price:p.price,stock:variant?variant.stock:p.stock,description:variant?(variant.storage+' · '+variant.color):p.details};
   }
+
+  const palette=[['Black','#17191d'],['White','#f5f5f3'],['Silver','#c8cdd1'],['Blue','#274e86'],['Pink','#e8b5c0'],['Gold','#d8c29a'],['Purple','#9584ad'],['Green','#8cae9f'],['Red','#c64c50'],['Grey','#858b92'],['Graphite','#505056'],['Natural Titanium','#b4a99a'],['Desert Titanium','#b28e75'],['Midnight','#242e3c'],['Starlight','#eee8dc'],['Yellow','#f0dc72'],['Orange','#ed864c'],['Teal','#6aa7a6'],['Cream','#f1e6d6'],['Space Black','#303035'],['Sierra Blue','#9eb7c9'],['Pacific Blue','#536e84'],['Rose Gold','#d9b0a4'],['Coral','#ef8f83'],['Mint','#b5d9c7'],['Lavender','#c3b7e5'],['Titanium Black','#3e4041'],['Titanium White','#e7e4de'],['Titanium Blue','#64748b'],['Phantom Black','#23252c'],['Burgundy','#774352'],['Cream White','#f5f0e8'],['Light Blue','#a9cce9'],['Dark Green','#375f50']];
+  const colorHex=name=>palette.find(x=>x[0].toLowerCase()===String(name).toLowerCase())?.[1]||'#adb5bd';
   function picker(p){
     const list=rows(p);if(!list.length)return '';
     const here=selection(p),storages=[...new Set(list.map(x=>x.storage))],colors=[...new Set(list.map(x=>x.color))];
     const storageOptions=storages.map(s=>{const inStock=list.some(x=>x.storage===s&&x.stock>0);return '<button type="button" class="gp-vopt '+(here.storage===s?'picked ':'')+(!inStock?'unavailable':'')+'" data-v-storage="'+esc(s)+'" aria-pressed="'+(here.storage===s)+'">'+esc(s)+'</button>'}).join('');
-    const colorOptions=colors.map(c=>{const available=list.some(x=>x.storage===here.storage&&x.color===c&&x.stock>0);const exists=list.some(x=>x.storage===here.storage&&x.color===c);const current=here.color===c;return '<button type="button" class="gp-vopt gp-copt '+(current?'picked ':'')+(!exists||!available?'unavailable':'')+'" data-v-color="'+esc(c)+'" aria-pressed="'+current+'" '+(!exists?'disabled':'')+'>'+esc(c)+'</button>'}).join('');
-    return '<div class="gp-vpick" aria-label="Select phone variant and colour"><div class="gp-vlabel">Storage: <strong>'+esc(here.storage)+'</strong></div><div class="gp-vrow">'+storageOptions+'</div><div class="gp-vlabel">Colour: <strong>'+esc(here.color)+'</strong></div><div class="gp-vrow">'+colorOptions+'</div></div>';
+    const colorOptions=colors.map(c=>{const exists=list.some(x=>x.storage===here.storage&&x.color===c),available=list.some(x=>x.storage===here.storage&&x.color===c&&x.stock>0),current=here.color===c;return '<button type="button" class="gp-color-swatch '+(current?'picked ':'')+(!available?'unavailable':'')+'" data-v-color="'+esc(c)+'" aria-label="'+esc(c)+(available?'':' unavailable')+'" title="'+esc(c)+'" aria-pressed="'+current+'" '+(!exists||!available?'disabled':'')+'><span class="gp-swatch-fill" style="background:'+colorHex(c)+'"></span>'+(current?'<span class="gp-swatch-tick">✓</span>':'')+'</button>'}).join('');
+    return '<div class="gp-vpick" aria-label="Select phone variant and colour"><div class="gp-vlabel">Storage: <strong>'+esc(here.storage)+'</strong></div><div class="gp-vrow">'+storageOptions+'</div><div class="gp-vlabel">Colour: <strong>'+esc(here.color)+'</strong></div><div class="gp-vrow gp-color-row">'+colorOptions+'</div></div>';
   }
   function mountEditor(form,initial){
     const host=form.querySelector('#gp-variant-manager');if(!host)return;
-    let list=sane(initial.variantOptions||[]);
-    host.innerHTML='<label class="toggle"><input type="checkbox" id="gp-v-enabled" '+(list.length?'checked':'')+'> Enable storage & colour combinations for this product</label><p class="field-tip">Enter storage and colours separated by commas, then generate the available combinations. Set an individual selling price and stock for each row. Nothing is generated automatically for other products.</p><div id="gp-v-panel" '+(list.length?'':'hidden')+'><div class="field-grid"><div class="field"><label>Storage values (comma-separated)</label><input type="text" id="gp-v-storages" placeholder="128GB, 256GB"></div><div class="field"><label>Colours (comma-separated)</label><input type="text" id="gp-v-colors" placeholder="Blue, Black, White"></div></div><div style="margin:12px 0"><button class="btn sm" type="button" id="gp-v-generate">+ Generate / Add Combinations</button></div><div style="overflow-x:auto"><table class="gp-vtable"><thead><tr><th>Storage</th><th>Colour</th><th>Our Price ₹</th><th>Stock</th><th></th></tr></thead><tbody id="gp-v-list"></tbody></table></div><p class="field-tip" id="gp-v-summary"></p></div>';
-    const enabled=host.querySelector('#gp-v-enabled'),panel=host.querySelector('#gp-v-panel'),body=host.querySelector('#gp-v-list');
-    const price=form.elements.price,stock=form.elements.stock;
-    const stor=host.querySelector('#gp-v-storages'),cols=host.querySelector('#gp-v-colors');
-    stor.value=[...new Set(list.map(x=>x.storage))].join(', ');cols.value=[...new Set(list.map(x=>x.color))].join(', ');
-    function syncBase(){
-      const on=enabled.checked;
-      price.readOnly=on;stock.readOnly=on;price.title=on?'Calculated automatically from variants':'';stock.title=on?'Total stock calculated from variants':'';
-      if(!on)return;
-      const good=list.filter(x=>x.storage&&x.color&&Number(x.price)>0);
-      if(good.length){price.value=Math.min(...good.map(x=>Number(x.price)));stock.value=good.reduce((s,x)=>s+(Number(x.stock)||0),0)}
-      host.querySelector('#gp-v-summary').textContent=good.length+' combinations · Total stock: '+good.reduce((s,x)=>s+(Number(x.stock)||0),0)+' · Starting price: ₹'+(good.length?Math.min(...good.map(x=>Number(x.price))).toLocaleString('en-IN'):'0');
+    const old=sane(initial.variantOptions||[]);
+    const selectedStorages=new Set(old.map(x=>x.storage)),selectedColors=new Set(old.map(x=>x.color));
+    const allStorages=[...new Set(['64GB','128GB','256GB','512GB','1TB','2TB',...selectedStorages])];
+    const allColors=[...new Set([...palette.map(x=>x[0]),...selectedColors])];
+    const storageData={};for(const s of allStorages){const entries=old.filter(x=>x.storage===s);storageData[s]={price:entries[0]?.price||0,stock:entries.reduce((n,x)=>n+x.stock,0)}}
+    host.innerHTML='<p class="field-tip">Choose the available storage sizes, set each price, then select the phone colours. Only selected colours will appear on the public product page.</p><div class="gp-v-manager-block"><label class="gp-v-editor-label">STORAGE · PRICE · STOCK</label><div class="gp-v-storage-grid" id="gp-v-storage-grid"></div><div class="gp-v-custom-line"><input type="text" id="gp-v-custom-storage" placeholder="Custom storage, e.g. 8GB / 128GB" maxlength="65"><button type="button" class="btn sm" id="gp-v-add-storage">+ Add Storage</button></div></div><div class="gp-v-manager-block"><label class="gp-v-editor-label">SELECT AVAILABLE PHONE COLOURS</label><div class="gp-v-color-grid" id="gp-v-color-grid"></div><div class="gp-v-custom-line"><input type="text" id="gp-v-custom-color" placeholder="Custom colour name" maxlength="65"><button type="button" class="btn sm" id="gp-v-add-color">+ Add Colour</button></div></div><p class="field-tip" id="gp-v-summary"></p>';
+    const price=form.elements.price,stock=form.elements.stock,storageHost=host.querySelector('#gp-v-storage-grid'),colorHost=host.querySelector('#gp-v-color-grid');
+    function sync(){
+      const active=selectedStorages.size>0&&selectedColors.size>0;
+      price.readOnly=active;stock.readOnly=active;
+      if(active){const vals=[...selectedStorages].map(s=>storageData[s]).filter(x=>x?.price>0);if(vals.length){price.value=Math.min(...vals.map(x=>x.price));stock.value=[...selectedStorages].reduce((n,s)=>n+(storageData[s]?.stock||0),0)}}
+      host.querySelector('#gp-v-summary').textContent=selectedStorages.size+' storage sizes · '+selectedColors.size+' colours selected · Only selected options appear publicly';
     }
     function render(){
-      panel.hidden=!enabled.checked;
-      body.innerHTML=list.map((x,i)=>'<tr><td>'+esc(x.storage)+'</td><td>'+esc(x.color)+'</td><td><input type="number" min="1" step="1" data-v-price="'+i+'" value="'+esc(x.price||'')+'" required></td><td><input type="number" min="0" step="1" data-v-stock="'+i+'" value="'+esc(x.stock)+'" required></td><td><button type="button" class="btn sm danger" data-v-remove="'+i+'" aria-label="Remove combination">×</button></td></tr>').join('')||'<tr><td colspan="5">No combinations yet. Enter storage and colours and click Generate.</td></tr>';
-      for(const input of body.querySelectorAll('input'))input.disabled=!enabled.checked;
-      syncBase();
+      storageHost.innerHTML=allStorages.map(s=>'<div class="gp-v-storage-card '+(selectedStorages.has(s)?'selected':'')+'"><label class="gp-v-storage-head"><input type="checkbox" data-storage-toggle="'+esc(s)+'" '+(selectedStorages.has(s)?'checked':'')+'><strong>'+esc(s)+'</strong></label><div class="gp-v-price-stock"><label>Price ₹<input type="number" min="1" step="1" data-storage-price="'+esc(s)+'" placeholder="31999" value="'+(storageData[s]?.price||'')+'" '+(!selectedStorages.has(s)?'disabled':'')+'></label><label>Stock<input type="number" min="0" step="1" data-storage-stock="'+esc(s)+'" value="'+(storageData[s]?.stock||0)+'" '+(!selectedStorages.has(s)?'disabled':'')+'></label></div></div>').join('');
+      colorHost.innerHTML=allColors.map(c=>'<label class="gp-v-color-item '+(selectedColors.has(c)?'selected':'')+'"><input type="checkbox" data-color-toggle="'+esc(c)+'" '+(selectedColors.has(c)?'checked':'')+'><span class="gp-v-color-dot" style="background:'+colorHex(c)+'"></span><span>'+esc(c)+'</span></label>').join('');
+      sync();
     }
-    enabled.addEventListener('change',render);
-    host.querySelector('#gp-v-generate').addEventListener('click',()=>{
-      const storage=stor.value.split(',').map(clean).filter(Boolean);
-      const colors=cols.value.split(',').map(clean).filter(Boolean);
-      if(!storage.length||!colors.length){alert('Enter at least one storage and one colour.');return}
-      if(new Set(storage).size*new Set(colors).size>200){alert('Maximum 200 combinations per product.');return}
-      for(const s of [...new Set(storage)])for(const c of [...new Set(colors)]){
-        if(!list.some(x=>x.storage===s&&x.color===c))list.push({storage:s,color:c,price:Number(price.value)||0,stock:0});
-      }
-      render();
-    });
-    body.addEventListener('input',e=>{const input=e.target;if(input.dataset.vPrice!=null){list[Number(input.dataset.vPrice)].price=Number(input.value)||0;syncBase()}if(input.dataset.vStock!=null){list[Number(input.dataset.vStock)].stock=Number(input.value)||0;syncBase()}});
-    body.addEventListener('click',e=>{const b=e.target.closest('[data-v-remove]');if(!b)return;list.splice(Number(b.dataset.vRemove),1);render()});
+    host.addEventListener('change',e=>{const t=e.target;if(t.dataset.storageToggle!==undefined){t.checked?selectedStorages.add(t.dataset.storageToggle):selectedStorages.delete(t.dataset.storageToggle);render()}else if(t.dataset.colorToggle!==undefined){t.checked?selectedColors.add(t.dataset.colorToggle):selectedColors.delete(t.dataset.colorToggle);render()}});
+    host.addEventListener('input',e=>{const t=e.target;if(t.dataset.storagePrice!==undefined){storageData[t.dataset.storagePrice].price=Number(t.value)||0;sync()}else if(t.dataset.storageStock!==undefined){storageData[t.dataset.storageStock].stock=Math.max(0,Math.floor(Number(t.value)||0));sync()}});
+    host.querySelector('#gp-v-add-storage').addEventListener('click',()=>{const t=host.querySelector('#gp-v-custom-storage'),s=clean(t.value);if(!s)return;if(!allStorages.includes(s)){allStorages.push(s);storageData[s]={price:0,stock:0}}selectedStorages.add(s);t.value='';render()});
+    host.querySelector('#gp-v-add-color').addEventListener('click',()=>{const t=host.querySelector('#gp-v-custom-color'),s=clean(t.value);if(!s)return;if(!allColors.includes(s))allColors.push(s);selectedColors.add(s);t.value='';render()});
     form.gpReadVariantOptions=()=>{
-      if(!enabled.checked)return [];
-      if(!list.length)throw Error('Generate at least one storage and colour combination.');
-      if(list.some(x=>!x.storage||!x.color||!Number.isInteger(x.price)||x.price<=0||!Number.isInteger(x.stock)||x.stock<0))throw Error('Every variant requires a valid price above ₹0 and stock of 0 or more.');
-      if(new Set(list.map(x=>x.storage.toLowerCase()+'|'+x.color.toLowerCase())).size!==list.length)throw Error('Duplicate storage and colour combination.');
-      return sane(list);
+      if(!selectedStorages.size&&!selectedColors.size)return [];
+      if(!selectedStorages.size||!selectedColors.size)throw Error('Select at least one storage size and one colour.');
+      const options=[];for(const s of selectedStorages){const d=storageData[s];if(!Number.isInteger(d.price)||d.price<=0)throw Error('Enter a valid price for '+s);if(!Number.isInteger(d.stock)||d.stock<0)throw Error('Enter valid stock for '+s);const cs=[...selectedColors];for(let i=0;i<cs.length;i++)options.push({storage:s,color:cs[i],price:d.price,stock:i===0?d.stock:0})}
+      if(options.length>200)throw Error('Maximum 200 combinations.');return sane(options);
     };
     render();
   }
   function styles(){
     if(document.getElementById('gp-variant-styles'))return;
-    const st=document.createElement('style');st.id='gp-variant-styles';st.textContent='.gp-vpick{margin:18px 0 16px}.gp-vlabel{font-weight:650;font-size:14px;margin:13px 0 9px}.gp-vrow{display:flex;flex-wrap:wrap;gap:9px}.gp-vopt{border:1px solid #d5d5d5;border-radius:9px;padding:11px 15px;background:#fff;color:#2d3540;font-weight:600;min-height:43px}.gp-vopt.picked{background:#effaf6;border-color:#4bbbad;color:#147969;box-shadow:0 0 0 1px #4bbbad}.gp-vopt.unavailable{color:#999;background:#f8f8f8;text-decoration:line-through}.gp-vopt:disabled{opacity:.5;cursor:not-allowed}.gp-vtable{width:100%;border-collapse:collapse;font-size:12px;min-width:460px}.gp-vtable th,.gp-vtable td{padding:9px;border-bottom:1px solid #e7e9ee;text-align:left}.gp-vtable input{width:100%;min-width:85px;padding:9px;border:1px solid #dde2eb;border-radius:7px}.gp-vtable th{font-weight:750}#gp-v-panel[hidden]{display:none!important}';document.head.appendChild(st);
+    const st=document.createElement('style');st.id='gp-variant-styles';st.textContent='.gp-vpick{margin:22px 0}.gp-vlabel{font-weight:700;font-size:17px;margin:17px 0 12px}.gp-vrow{display:flex;flex-wrap:wrap;gap:10px}.gp-vopt{border:1px solid #d4d6d9;border-radius:12px;padding:12px 16px;background:#fff;color:#424b55;font-weight:650;min-height:46px}.gp-vopt.picked{background:#e9f7f5;border-color:#6bc8bd;color:#238b80;box-shadow:0 0 0 1px #6bc8bd}.gp-vopt.unavailable{opacity:.45;text-decoration:line-through}.gp-color-row{gap:15px}.gp-color-swatch{width:47px;height:47px;border-radius:50%;border:2px solid transparent;background:transparent;padding:4px;position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.gp-color-swatch.picked{border-color:#62bfb5}.gp-color-swatch.unavailable{opacity:.38}.gp-swatch-fill{width:36px;height:36px;border-radius:50%;border:2px solid #aaa;display:block}.gp-swatch-tick{position:absolute;color:#fff;font-size:24px;font-weight:800;text-shadow:0 1px 4px #222}.gp-v-manager-block{margin:17px 0 24px}.gp-v-editor-label{display:block;font-weight:800;letter-spacing:1.1px;font-size:12px;margin-bottom:12px}.gp-v-storage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.gp-v-storage-card{padding:12px;border:1px solid #e1e5ed;border-radius:13px;background:#fff}.gp-v-storage-card.selected{border-color:#75c8bf;background:#f3fbf9}.gp-v-storage-head{display:flex;gap:8px;align-items:center}.gp-v-price-stock{display:flex;gap:8px;margin-top:9px}.gp-v-price-stock label{font-size:11px;min-width:0;flex:1}.gp-v-price-stock input{width:100%;padding:8px 5px;border:1px solid #dce2e9;border-radius:7px}.gp-v-color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:9px}.gp-v-color-item{border:1px solid #e2e6ec;border-radius:12px;display:flex;align-items:center;gap:7px;padding:9px 7px;cursor:pointer;font-size:12px;background:white}.gp-v-color-item.selected{border-color:#61bfb3;background:#eefaf7}.gp-v-color-dot{width:25px;height:25px;border-radius:50%;border:1px solid #aaa;flex-shrink:0}.gp-v-custom-line{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.gp-v-custom-line input{min-width:170px;flex:1;padding:10px;border:1px solid #dce2e9;border-radius:8px}';document.head.appendChild(st);
   }
   styles();
   window.GPVariants={rows,active,selection,choose,key,resolve,picker,mountEditor};
