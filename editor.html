@@ -157,8 +157,8 @@ function gpOCRExtract(text){
   ['chip',/(?:\b(?:a\d{2,3}|bionic|snapdragon|dimensity|exynos|tensor)\b|processor|chipset|chip\b|hexa\s*core)/i],
   ['rear',/(?:rear|back|main|primary)\s*camera|(?:\d+\s*mp\s*\+\s*\d+\s*mp)/i],
   ['front',/(?:front|selfie)\s*camera/i],
-  ['display',/(?:display|screen|retina|amoled|oled)\b/i],
-  ['battery',/(?:battery|mAh)\b/i]
+  ['display',/(?:\b\d{1,2}(?:[.,]\d+)?\s*(?:inch|inches|in\b|["″])|\b(?:retina|amoled|oled)\b.*\b(?:display|screen)\b)/i],
+  ['battery',/\b\d{3,5}\s*m\s*a\s*h\b/i]
  ];
  const isTitle=(line)=>rules.some(([,rx])=>rx.test(line));
  const isDescription=(line)=>line.length>=8&&!isTitle(line)&&!(/^(?:product highlights|highlights|specifications|features|show more|view details)$/i).test(line);
