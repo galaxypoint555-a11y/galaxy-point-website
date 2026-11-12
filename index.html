@@ -399,11 +399,12 @@ async function gpLoadPublishedCatalog(){
   // Display only real, published inventory from Supabase; never silently fall back to sample products.
   const meta=window.gpPublishedSettings?.product_metadata||{};const nextItems=rows.map((p,i)=>({id:p.id,condition:meta[String(p.id)]?.condition||'',gallery:meta[String(p.id)]?.gallery||[],productDescription:meta[String(p.id)]?.description||'',firstMedia:meta[String(p.id)]?.firstMedia||'photo',productVideo:meta[String(p.id)]?.productVideo||'',highlights:meta[String(p.id)]?.highlights||[],color:meta[String(p.id)]?.color||'',marketPrice:Number(meta[String(p.id)]?.marketPrice)||0,name:p.title,brand:p.brand||p.category,category:p.category,details:[p.variant,p.description].filter(Boolean).join(' • '),price:p.price_inr,stock:p.stock,image_url:p.image_url,photoIndex:i%6+1}));
   const nextSignature=JSON.stringify(nextItems);
-  if(nextSignature!==window.gpCatalogSignature){window.gpCatalogSignature=nextSignature;items=nextItems;show();}
+  if(nextSignature!==window.gpCatalogSignature){window.gpCatalogSignature=nextSignature;items=nextItems;show();if(page==='home')gpRefreshFeaturedDeals();}
  }catch(err){console.warn('Galaxy Point catalog sync unavailable; hiding outdated sample products.',err);if(!window.gpCatalogSignature){items=[];show();}}
 }
 gpLoadPublishedCatalog();
 
+function gpRefreshFeaturedDeals(){if(page!=='home')return;const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\\'':'&#39;'}[c]));const daily=document.querySelector('.gp-deal-grid:not(.gp-price-grid)'),price=document.querySelector('.gp-price-grid');if(daily){const html=gpDailyDeals(esc);if(daily.innerHTML!==html)daily.innerHTML=html}if(price){const html=gpPriceDropProducts(esc);if(price.innerHTML!==html)price.innerHTML=html}}
 async function gpLoadSiteSettings(){
  try{
   const cfg=window.GP_CONFIG;if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey)return;
@@ -415,6 +416,8 @@ async function gpLoadSiteSettings(){
   const settingsChanged=settingsSignature!==window.gpSettingsSignature;
   window.gpSettingsSignature=settingsSignature;
   window.gpPublishedSettings=settings;
+  // Apply featured sections as soon as settings arrive, without waiting for another page render.
+  if(page==='home')gpRefreshFeaturedDeals();
   try{if(typeof settings.hero_video_url==='string'&&/^https:\/\//i.test(settings.hero_video_url))localStorage.setItem('gp_cached_hero_video_url',settings.hero_video_url)}catch(_e){}
   if(settings.category_images&&typeof settings.category_images==='object'){
    for(const name of ['iPhone','Samsung','Laptops']){
@@ -423,7 +426,7 @@ async function gpLoadSiteSettings(){
    }
   }
   window.gpVideoSettingsLoaded=true;
-  if(settingsChanged){if(page==='home'){window.gpRenderedHeroVideo=settings.hero_video_url;setupStoreVideo()}else if(page==='product')show();}
+  if(settingsChanged){if(page==='home'){window.gpRenderedHeroVideo=settings.hero_video_url;setupStoreVideo();gpRefreshFeaturedDeals()}else if(page==='product')show();}
   else if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;setupStoreVideo();}
  }catch(err){console.warn('Galaxy Point site settings unavailable',err);window.gpVideoSettingsLoaded=true;if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;show();}}
 }
