@@ -34,6 +34,7 @@
     const parts=String(k).split('@@'),p=items.find(x=>String(x.id)===parts[0]);if(!p)return null;
     const options=rows(p);
     const variant=parts.length===3?options.find(x=>x.storage===decodeURIComponent(parts[1])&&x.color===decodeURIComponent(parts[2])):null;
+    if(parts.length===3&&!variant)return null;
     return {p,variant,key:k,price:variant?variant.price:p.price,stock:variant?variant.stock:p.stock,description:variant?(variant.storage+' · '+variant.color):p.details};
   }
   function picker(p){
@@ -62,6 +63,7 @@
     function render(){
       panel.hidden=!enabled.checked;
       body.innerHTML=list.map((x,i)=>'<tr><td>'+esc(x.storage)+'</td><td>'+esc(x.color)+'</td><td><input type="number" min="1" step="1" data-v-price="'+i+'" value="'+esc(x.price||'')+'" required></td><td><input type="number" min="0" step="1" data-v-stock="'+i+'" value="'+esc(x.stock)+'" required></td><td><button type="button" class="btn sm danger" data-v-remove="'+i+'" aria-label="Remove combination">×</button></td></tr>').join('')||'<tr><td colspan="5">No combinations yet. Enter storage and colours and click Generate.</td></tr>';
+      for(const input of body.querySelectorAll('input'))input.disabled=!enabled.checked;
       syncBase();
     }
     enabled.addEventListener('change',render);
