@@ -9,7 +9,7 @@
   "theme_color": "#302018",
   "icons": [
     {
-      "src": "/gp-app-icon.svg",
+      "src": "/gp-app-icon.svg?v=white-blue-2",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
