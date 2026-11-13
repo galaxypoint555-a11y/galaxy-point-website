@@ -39,23 +39,37 @@ function modal(html){
 async function open(){
  const s=await session();if(s){
  const u=s.user,m=u.user_metadata||{};
- const node=modal('<h2>My Account</h2><p>Welcome to Galaxy Point</p><div class="gp-account-data"><b>Name</b><div id="gp-a-name"></div></div><div class="gp-account-data"><b>Email</b><div id="gp-a-email"></div></div><div class="gp-account-data"><b>Mobile Number</b><div id="gp-a-phone"></div></div><button class="gp-act gp-secondary" id="gp-logout">LOG OUT</button>');
+ const node=modal('<h2>My Account</h2><p>Welcome to Galaxy Point</p><div class="gp-account-data"><b>Name</b><div id="gp-a-name"></div></div><div class="gp-account-data"><b>Mobile Number</b><div id="gp-a-phone"></div></div><button class="gp-act gp-secondary" id="gp-logout">LOG OUT</button>');
  node.querySelector('#gp-a-name').textContent=m.full_name||m.name||'Not provided';
- node.querySelector('#gp-a-email').textContent=u.email||'Not provided';
  node.querySelector('#gp-a-phone').textContent=m.phone||u.phone||'Not provided';
  node.querySelector('#gp-logout').onclick=async()=>{try{await api('logout',{},s.access_token)}catch(_){}localStorage.removeItem(KEY);close();refreshMenu()};
  return;
  }
- const node=modal('<h2>Login to Galaxy Point</h2><p>Enter your email address. We will send a secure 6–8 digit OTP.</p><form id="gp-account-login"><label for="gp-login-name">Full Name (new customers)</label><input id="gp-login-name" type="text" autocomplete="name" maxlength="120" placeholder="Your full name"><label for="gp-login-phone">Mobile Number (new customers)</label><input id="gp-login-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile number"><label for="gp-login-email">Email Address</label><input id="gp-login-email" type="email" autocomplete="email" required placeholder="you@example.com"><div id="gp-login-step" hidden><label for="gp-login-otp">Email OTP</label><input id="gp-login-otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" pattern="[0-9]{6,8}" placeholder="6–8 digit code"><p>Check your email for the verification code.</p></div><p class="gp-account-error" role="alert" id="gp-login-error"></p><button class="gp-act" id="gp-login-submit">SEND EMAIL OTP</button></form>');
- const form=node.querySelector('form'),name=node.querySelector('#gp-login-name'),phone=node.querySelector('#gp-login-phone'),email=node.querySelector('#gp-login-email'),step=node.querySelector('#gp-login-step'),otp=node.querySelector('#gp-login-otp'),err=node.querySelector('#gp-login-error'),btn=node.querySelector('#gp-login-submit');let sent=false;
+ const node=modal('<h2>Login to Galaxy Point</h2><p>Sign in using your email and password.</p><form id="gp-account-login"><div id="gp-signup-fields" hidden><label for="gp-login-name">Full Name</label><input id="gp-login-name" type="text" autocomplete="name" maxlength="120" placeholder="Your full name"><label for="gp-login-phone">Mobile Number</label><input id="gp-login-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile number"></div><label for="gp-login-email">Email Address</label><input id="gp-login-email" type="email" autocomplete="email" required placeholder="you@example.com"><label for="gp-login-password">Password</label><input id="gp-login-password" type="password" autocomplete="current-password" minlength="6" required placeholder="Enter password"><p class="gp-account-error" role="alert" id="gp-login-error"></p><button class="gp-act" id="gp-login-submit" type="submit">LOGIN</button><button class="gp-act gp-secondary" id="gp-switch-mode" type="button">Create new account</button><button class="gp-act gp-secondary" id="gp-reset-password" type="button">Forgot password?</button></form>');
+ const form=node.querySelector('form'),name=node.querySelector('#gp-login-name'),phone=node.querySelector('#gp-login-phone'),email=node.querySelector('#gp-login-email'),password=node.querySelector('#gp-login-password'),fields=node.querySelector('#gp-signup-fields'),err=node.querySelector('#gp-login-error'),btn=node.querySelector('#gp-login-submit'),switcher=node.querySelector('#gp-switch-mode');
+ let signup=false;
+ switcher.onclick=()=>{signup=!signup;fields.hidden=!signup;name.required=signup;phone.required=signup;password.autocomplete=signup?'new-password':'current-password';btn.textContent=signup?'CREATE ACCOUNT':'LOGIN';switcher.textContent=signup?'Already have an account? Login':'Create new account';err.textContent='';};
+ node.querySelector('#gp-reset-password').onclick=async()=>{err.textContent='';if(!email.validity.valid){err.textContent='Enter your email address first.';email.focus();return}try{await api('recover',{email:email.value.trim().toLowerCase()});err.style.color='#236b43';err.textContent='Password reset link sent to your email. Please check your inbox.'}catch(ex){err.style.color='#b32e37';err.textContent=ex.message||'Could not send reset link.'}};
  form.onsubmit=async e=>{
- e.preventDefault();btn.disabled=true;err.textContent='';
+ e.preventDefault();btn.disabled=true;err.style.color='#b32e37';err.textContent='';
  try{
- if(!sent){if(name.value.trim()&&name.value.trim().length<2)throw Error('Enter a valid name.');if(phone.value.trim()&&!/^[0-9]{10}$/.test(phone.value.trim()))throw Error('Enter a valid 10-digit mobile number.');await api('otp',{email:email.value.trim().toLowerCase(),create_user:true,data:{full_name:name.value.trim(),phone:phone.value.trim()}});sent=true;step.hidden=false;otp.required=true;email.readOnly=true;name.readOnly=true;phone.readOnly=true;btn.textContent='VERIFY OTP & LOGIN';otp.focus()}
- else{const d=await api('verify',{email:email.value.trim().toLowerCase(),token:otp.value.trim(),type:'email'});if(!d.access_token||!d.user)throw Error('Verification failed');if(name.value.trim()||phone.value.trim()){try{const update=await fetch(authUrl+'user',{method:'PUT',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+d.access_token,'Content-Type':'application/json'},body:JSON.stringify({data:{...(name.value.trim()?{full_name:name.value.trim()}:{}),...(phone.value.trim()?{phone:phone.value.trim()}: {})}})});if(update.ok)d.user=await update.json();}catch(e){console.warn('Account profile update pending',e)}}save({...d,expires_at:Math.floor(Date.now()/1000)+(d.expires_in||3600)});close();await refreshMenu();await open()}
+ const address=email.value.trim().toLowerCase();
+ let d;
+ if(signup){
+  if(name.value.trim().length<2)throw Error('Enter your full name.');
+  if(!/^[0-9]{10}$/.test(phone.value.trim()))throw Error('Enter a valid 10-digit mobile number.');
+  d=await api('signup',{email:address,password:password.value,data:{full_name:name.value.trim(),phone:phone.value.trim()}});
+  if(!d.access_token){err.style.color='#236b43';err.textContent='Account created. Check your email if confirmation is required, then log in.';signup=false;fields.hidden=true;name.required=false;phone.required=false;btn.textContent='LOGIN';switcher.textContent='Create new account';return}
+ }else{
+  d=await api('token?grant_type=password',{email:address,password:password.value});
+ }
+ if(!d.access_token||!d.user)throw Error('Unable to log in. Please check your details.');
+ save({...d,expires_at:Math.floor(Date.now()/1000)+(d.expires_in||3600)});
+ close();await refreshMenu();await open();
  }catch(ex){err.textContent=ex.message||'Please try again.'}
  finally{btn.disabled=false}
  };
+
 }
 home.addEventListener('click',e=>{e.stopPropagation();document.getElementById('menuPop')?.classList.remove('visible');document.getElementById('gpDrawerBackdrop')?.classList.remove('visible');document.body.classList.remove('gp-menu-open');open()});
 document.addEventListener('gp-app-registered',refreshMenu);
