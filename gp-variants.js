@@ -18,8 +18,17 @@ function mountEditor(form,product){
   colors=[...host.querySelectorAll('[data-choice="color"]:checked')].map(x=>x.value);
   storages=[...host.querySelectorAll('[data-choice="storage"]:checked')].map(x=>x.value);
  }
+ function ensureSelectedUnits(){
+  if(!colors.length||!storages.length)return;
+  const existing=new Set(rows.map(r=>String(r.storage)+'|'+String(r.color)));
+  for(const storage of storages)for(const color of colors){
+   const key=storage+'|'+color;
+   if(!existing.has(key)){rows.push({storage,color,price:0,marketPrice:0,stock:0,batteryHealth:'',cycleCount:''});existing.add(key)}
+  }
+ }
  function draw(){
-  const allColors=[...new Set(['Black','White','Blue','Gold','Silver','Grey','Gray','Green','Pink','Purple','Red','Yellow','Natural Titanium','Desert Titanium',...colors])];
+  ensureSelectedUnits();
+  const allColors=[...new Set(['Black','White','Blue','Gold','Silver','Grey','Gray','Green','Pink','Purple','Red','Yellow','Natural Titanium','Desert Titanium','Midnight','Starlight','Space Gray','Space Black','Jet Black','Rose Gold','Coral','Orange','Teal','Ultramarine','Sierra Blue','Pacific Blue','Alpine Green','Deep Purple','Deep Blue','Cosmic Orange','Cloud White','Graphite','Midnight Green','Space Grey','Titanium Black','Titanium White','Titanium Blue','Titanium Gray',...colors])];
   const allStorage=[...new Set([...storageOptions,...storages])];
   const colorHtml=allColors.map(c=>check('color',c,colors.includes(c))).join('')+'<div class="field" style="margin-top:10px"><label>Add custom colour</label><input id="gp-custom-color" placeholder="Colour name"><button type="button" class="btn" id="gp-add-color">+ Add Colour</button></div>';
   const storageHtml=allStorage.map(x=>check('storage',x,storages.includes(x))).join('');
