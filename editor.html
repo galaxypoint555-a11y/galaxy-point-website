@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f7fd"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>Galaxy Point | Website Manager</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f7fd"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="gp-build" content="20261113-auto-update-1"><title>Galaxy Point | Website Manager</title>
 <style>
 :root{--ink:#17243d;--muted:#8893a9;--border:#e9edf5;--violet:#645bef;--lav:#eeedff;--pale:#f6f8fc;--green:#19875b;--shad:0 12px 40px rgba(30,50,100,.045)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--pale);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink)}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}img{display:block;max-width:100%}h1,h2,h3,h4,p{margin-top:0}a{color:inherit;text-decoration:none}
@@ -461,4 +461,36 @@ $('reset-preview').onclick=async()=>{if(!confirm('Reload live data and discard u
  catch(err){status.textContent='Publish failed: '+err.message}
  };
 })();
-</script></body></html>
+</script>
+<script>
+/* Check for a deployed editor version without interrupting unsaved product edits. */
+(function(){
+  const current=document.querySelector('meta[name="gp-build"]')?.content;
+  if(!current)return;
+  let notified=false;
+  const banner=document.createElement('div');
+  banner.id='gp-update-notice';
+  banner.style.cssText='display:none;position:fixed;bottom:18px;right:18px;z-index:999999;background:#17243d;color:white;border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px #0003;font:13px system-ui;max-width:340px';
+  banner.innerHTML='<span>New Editor update available.</span> <button type="button" style="margin-left:8px;background:#fff;color:#17243d;border:0;border-radius:7px;padding:7px 10px;cursor:pointer;font-weight:700">Refresh now</button>';
+  document.body.appendChild(banner);
+  banner.querySelector('button').onclick=()=>location.reload();
+  async function check(){
+    if(document.hidden||notified)return;
+    try{
+      const response=await fetch(location.pathname+'?gp_update_check='+Date.now(),{cache:'no-store'});
+      if(!response.ok)return;
+      const html=await response.text();
+      const next=html.match(/<meta name="gp-build" content="([^"]+)"/)?.[1];
+      if(!next||next===current)return;
+      notified=true;
+      const editing=!!document.querySelector('.overlay.open, #editor-overlay.open, .modal.open');
+      const changed=!!document.querySelector('input:focus,textarea:focus,select:focus,[contenteditable="true"]:focus');
+      if(editing||changed){banner.style.display='block';return;}
+      location.reload();
+    }catch(e){}
+  }
+  setInterval(check,20000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+})();
+</script>
+</body></html>
