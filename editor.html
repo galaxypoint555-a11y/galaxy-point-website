@@ -184,7 +184,7 @@ function gpRenderColorPhotos(){
   (gpColorVideoFiles[color]||[]).forEach((file,i)=>{const item=document.createElement('div');item.className='gp-color-video-item';const name=document.createElement('span');name.textContent='▶ '+file.name;const del=document.createElement('button');del.type='button';del.textContent='×';del.onclick=()=>{gpColorVideoFiles[color].splice(i,1);gpRenderColorPhotos()};item.append(name,del);videoList.appendChild(item)});
   group.appendChild(videoList);
   const videoLabel=document.createElement('label');videoLabel.className='gp-color-media-upload';videoLabel.textContent='+ Add '+color+' Videos';
-  const videoInput=document.createElement('input');videoInput.type='file';videoInput.accept='video/mp4,video/webm';videoInput.multiple=true;videoInput.hidden=true;videoInput.onchange=()=>{gpColorVideoFiles[color]??=[];gpColorVideoFiles[color].push(...[...videoInput.files].filter(f=>/^video\\/(mp4|webm)$/.test(f.type)));gpRenderColorPhotos()};videoLabel.appendChild(videoInput);group.appendChild(videoLabel);
+  const videoInput=document.createElement('input');videoInput.type='file';videoInput.accept='video/mp4,video/webm';videoInput.multiple=true;videoInput.hidden=true;videoInput.onchange=()=>{gpColorVideoFiles[color]??=[];gpColorVideoFiles[color].push(...[...videoInput.files].filter(f=>['video/mp4','video/webm'].includes(f.type)));gpRenderColorPhotos()};videoLabel.appendChild(videoInput);group.appendChild(videoLabel);
   gpColorPhotoHost.appendChild(group);
  });
 }
