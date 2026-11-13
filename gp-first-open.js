@@ -41,7 +41,7 @@ function show(){
   if(Date.now()-lastSent<60000)throw Error('Please wait 60 seconds before requesting another code.');
   const email=emailInput.value.trim().toLowerCase();
   if(!emailInput.checkValidity())throw Error('Please enter a valid email address.');
-  await authRequest('otp',{email,create_user:true,data:{full_name:nameInput.value.trim()}});
+  await authRequest('otp',{email,create_user:true,data:{full_name:nameInput.value.trim(),phone:phoneInput.value.trim()}});
   lastSent=Date.now();otpSent=true;otpStep.hidden=false;
   nameInput.readOnly=true;phoneInput.readOnly=true;emailInput.readOnly=true;
   button.innerHTML='VERIFY EMAIL &amp; COMPLETE REGISTRATION <span aria-hidden="true">→</span>';
@@ -67,6 +67,7 @@ function show(){
    button.textContent='VERIFYING EMAIL…';
    const verified=await authRequest('verify',{email:emailInput.value.trim().toLowerCase(),token,type:'email'});
    if(!verified.access_token||!verified.user?.id)throw Error('Email could not be verified. Please try again.');
+   try{localStorage.setItem('gp_customer_auth_v1',JSON.stringify({access_token:verified.access_token,refresh_token:verified.refresh_token,expires_at:Math.floor(Date.now()/1000)+(verified.expires_in||3600),user:verified.user}));}catch(_){}
    button.textContent='COMPLETING REGISTRATION…';
    const cfg=window.GP_CONFIG;
    const response=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/customer_login_events',{
