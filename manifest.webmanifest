@@ -2,7 +2,7 @@
   "name": "Galaxy Point Kharghar",
   "short_name": "Galaxy Point",
   "description": "Shop premium mobile phones and accessories at Galaxy Point Kharghar.",
-  "start_url": "/",
+  "start_url": "/?gp_direct_open=20261113",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
