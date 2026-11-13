@@ -470,7 +470,7 @@ $('reset-preview').onclick=async()=>{if(!confirm('Reload live data and discard u
   let notified=false;
   const banner=document.createElement('div');
   banner.id='gp-update-notice';
-  banner.style.cssText='display:none;position:fixed;bottom:18px;right:18px;z-index:999999;background:#17243d;color:white;border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px #0003;font:13px system-ui;max-width:340px';
+  banner.style.cssText='display:none;position:fixed;top:18px;right:18px;z-index:999999;background:#17243d;color:white;border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px #0003;font:13px system-ui;max-width:340px';
   banner.innerHTML='<span>New Editor update available.</span> <button type="button" style="margin-left:8px;background:#fff;color:#17243d;border:0;border-radius:7px;padding:7px 10px;cursor:pointer;font-weight:700">Refresh now</button>';
   document.body.appendChild(banner);
   banner.querySelector('button').onclick=()=>location.reload();
@@ -483,10 +483,7 @@ $('reset-preview').onclick=async()=>{if(!confirm('Reload live data and discard u
       const next=html.match(/<meta name="gp-build" content="([^"]+)"/)?.[1];
       if(!next||next===current)return;
       notified=true;
-      const editing=!!document.querySelector('.overlay.open, #editor-overlay.open, .modal.open');
-      const changed=!!document.querySelector('input:focus,textarea:focus,select:focus,[contenteditable="true"]:focus');
-      if(editing||changed){banner.style.display='block';return;}
-      location.reload();
+      banner.style.display='block';
     }catch(e){}
   }
   setInterval(check,20000);
