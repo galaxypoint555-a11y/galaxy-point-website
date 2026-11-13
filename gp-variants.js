@@ -1,30 +1,48 @@
-/* Galaxy Point variant editor — restored 2026-11-13 */
+/* Galaxy Point editor: separate Colour, Storage and Unit Details sections */
 (function(){
 'use strict';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const n=v=>Math.max(0,Math.floor(Number(v)||0));
-const storageOptions=['64GB','128GB','256GB','512GB','1TB'];
+const number=v=>Math.max(0,Math.floor(Number(v)||0));
+const storageOptions=['64GB','128GB','256GB','512GB','1TB','2TB'];
 function mountEditor(form,product){
- const host=form.querySelector('#gp-variant-manager');
+ const host=form.querySelector('#gp-variant-manager');if(!host)return;
  let rows=(Array.isArray(product?.variantOptions)?product.variantOptions:[]).map(r=>({...r}));
- if(!rows.length)rows=[{storage:storageOptions.find(x=>String(product?.storage||'').includes(x))||'128GB',color:product?.color?.split(',')[0]?.trim()||'Black',price:product?.price||0,marketPrice:product?.marketPrice||0,stock:product?.stock??1,batteryHealth:'',cycleCount:''}];
- function draw(){
- host.innerHTML='<p class="field-tip">Set storage, colour, battery health, cycle count, GP price, market price and stock for each available unit.</p><div id="gp-unit-rows">'+rows.map((r,i)=>'<div class="gp-unit-card" data-unit="'+i+'" style="border:1px solid #e5e9f1;border-radius:14px;padding:15px;margin:12px 0;background:#fafbff"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><strong>Unit '+(i+1)+'</strong><button type="button" class="btn" data-remove-unit="'+i+'">Remove</button></div><div class="field-grid">'+
- '<div class="field"><label>Storage</label><select data-k="storage">'+storageOptions.map(x=>'<option value="'+x+'" '+(r.storage===x?'selected':'')+'>'+x+'</option>').join('')+(storageOptions.includes(r.storage)?'':'<option selected value="'+esc(r.storage||'')+'">'+esc(r.storage||'Custom')+'</option>')+'</select></div>'+
- '<div class="field"><label>Colour</label><input data-k="color" data-color-toggle="1" value="'+esc(r.color)+'" placeholder="e.g. Blue"></div>'+
- '<div class="field"><label>Battery Health %</label><input type="number" min="0" max="100" data-k="batteryHealth" value="'+esc(r.batteryHealth??'')+'" placeholder="e.g. 92"></div>'+
- '<div class="field"><label>Cycle Count</label><input type="number" min="0" data-k="cycleCount" value="'+esc(r.cycleCount??'')+'" placeholder="Optional"></div>'+
- '<div class="field"><label>GP Price ₹</label><input type="number" min="0" data-k="price" value="'+esc(r.price??'')+'" required></div>'+
- '<div class="field"><label>Market Price ₹</label><input type="number" min="0" data-k="marketPrice" value="'+esc(r.marketPrice??'')+'"></div>'+
- '<div class="field"><label>Stock</label><input type="number" min="0" data-k="stock" value="'+esc(r.stock??1)+'" required></div>'+
- '<div class="field"><label>Discount</label><strong data-discount style="display:block;padding:10px 0">—</strong></div></div></div>').join('')+'</div><button type="button" class="btn primary" id="gp-add-unit">+ Add another unit / variant</button>';
- host.querySelectorAll('[data-unit]').forEach(card=>discount(card));
+ if(!rows.length)rows=[{storage:product?.storage||'128GB',color:String(product?.color||'Black').split(',')[0].trim(),price:product?.price||0,marketPrice:product?.marketPrice||0,stock:product?.stock??1,batteryHealth:'',cycleCount:''}];
+ let colors=[...new Set([...String(product?.color||'').split(',').map(x=>x.trim()).filter(Boolean),...rows.map(r=>r.color).filter(Boolean)])];
+ let storages=[...new Set(rows.map(r=>r.storage).filter(Boolean))];
+ const section=(title,body)=>'<section style="background:#fff;border:1px solid #e3e8f1;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 3px 14px rgba(20,40,80,.04)"><h3 style="margin:0 0 12px;font-size:16px">'+title+'</h3>'+body+'</section>';
+ const check=(type,val,selected)=>'<label style="display:inline-flex;align-items:center;gap:7px;border:1px solid #dce3ef;border-radius:10px;padding:9px 12px;margin:4px;cursor:pointer;background:'+(selected?'#edf4ff':'#fff')+'"><input type="checkbox" data-choice="'+type+'" value="'+esc(val)+'" '+(selected?'checked':'')+'>'+esc(val)+'</label>';
+ function capture(){
+  rows=[...host.querySelectorAll('[data-unit]')].map(card=>Object.fromEntries([...card.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value])));
+  colors=[...host.querySelectorAll('[data-choice="color"]:checked')].map(x=>x.value);
+  storages=[...host.querySelectorAll('[data-choice="storage"]:checked')].map(x=>x.value);
  }
- function discount(card){const price=Number(card.querySelector('[data-k="price"]').value),market=Number(card.querySelector('[data-k="marketPrice"]').value);card.querySelector('[data-discount]').textContent=market>price&&price>=0?Math.round((market-price)/market*100)+'% OFF':'—';}
- function snapshot(){rows=[...host.querySelectorAll('[data-unit]')].map(card=>Object.fromEntries([...card.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value])));}
+ function draw(){
+  const allColors=[...new Set(['Black','White','Blue','Gold','Silver','Grey','Gray','Green','Pink','Purple','Red','Yellow','Natural Titanium','Desert Titanium',...colors])];
+  const allStorage=[...new Set([...storageOptions,...storages])];
+  const colorHtml=allColors.map(c=>check('color',c,colors.includes(c))).join('')+'<div class="field" style="margin-top:10px"><label>Add custom colour</label><input id="gp-custom-color" placeholder="Colour name"><button type="button" class="btn" id="gp-add-color">+ Add Colour</button></div>';
+  const storageHtml=allStorage.map(x=>check('storage',x,storages.includes(x))).join('');
+  const units=rows.map((r,i)=>'<div data-unit="'+i+'" style="border:1px solid #e5e9f1;border-radius:12px;padding:13px;margin:10px 0;background:#fafbff"><div style="display:flex;justify-content:space-between;align-items:center"><strong>Unit '+(i+1)+'</strong><button type="button" class="btn" data-remove-unit="'+i+'">Remove</button></div><div class="field-grid">'+
+  '<div class="field"><label>Storage</label><select data-k="storage">'+[...new Set([...storages,r.storage])].map(x=>'<option value="'+esc(x)+'" '+(r.storage===x?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
+  '<div class="field"><label>Colour</label><select data-k="color">'+[...new Set([...colors,r.color])].map(x=>'<option value="'+esc(x)+'" '+(r.color===x?'selected':'')+'>'+esc(x)+'</option>').join('')+'</select></div>'+
+  '<div class="field"><label>Battery Health %</label><input type="number" min="0" max="100" data-k="batteryHealth" value="'+esc(r.batteryHealth??'')+'"></div>'+
+  '<div class="field"><label>Cycle Count</label><input type="number" min="0" data-k="cycleCount" value="'+esc(r.cycleCount??'')+'"></div>'+
+  '<div class="field"><label>GP Price ₹</label><input type="number" min="0" data-k="price" value="'+esc(r.price??'')+'"></div>'+
+  '<div class="field"><label>Market Price ₹</label><input type="number" min="0" data-k="marketPrice" value="'+esc(r.marketPrice??'')+'"></div>'+
+  '<div class="field"><label>Stock</label><input type="number" min="0" data-k="stock" value="'+esc(r.stock??1)+'"></div>'+
+  '<div class="field"><label>Discount</label><strong data-discount>—</strong></div></div></div>').join('');
+  host.innerHTML=section('1. All Colours',colorHtml)+section('2. Storage / Variants',storageHtml)+section('3. Battery Health, Cycle Count & Pricing',units+'<button type="button" class="btn primary" id="gp-add-unit">+ Add Another Unit</button>');
+  host.querySelectorAll('[data-unit]').forEach(discount);
+ }
+ function discount(card){const p=Number(card.querySelector('[data-k="price"]').value),m=Number(card.querySelector('[data-k="marketPrice"]').value);card.querySelector('[data-discount]').textContent=m>p&&p>=0?Math.round((m-p)/m*100)+'% OFF':'—';}
  host.addEventListener('input',e=>{const card=e.target.closest('[data-unit]');if(card)discount(card)});
- host.addEventListener('click',e=>{if(e.target.id==='gp-add-unit'){snapshot();rows.push({...rows[rows.length-1],price:0,marketPrice:0,stock:1,batteryHealth:'',cycleCount:''});draw()}const btn=e.target.closest('[data-remove-unit]');if(btn){snapshot();if(rows.length>1){rows.splice(Number(btn.dataset.removeUnit),1);draw()}}});
- form.gpReadVariantOptions=()=>{snapshot();return rows.map(r=>({storage:String(r.storage||'').trim(),color:String(r.color||'').trim(),price:n(r.price),marketPrice:n(r.marketPrice),stock:n(r.stock),batteryHealth:r.batteryHealth===''?'':String(Math.min(100,n(r.batteryHealth))),cycleCount:r.cycleCount===''?'':String(n(r.cycleCount))})).filter(r=>r.storage&&r.color&&r.price>0)};
+ host.addEventListener('change',e=>{if(e.target.matches('[data-choice]')){capture();draw()}});
+ host.addEventListener('click',e=>{
+  if(e.target.id==='gp-add-color'){const v=host.querySelector('#gp-custom-color').value.trim();if(v){capture();colors=[...new Set([...colors,v])];draw()}}
+  if(e.target.id==='gp-add-unit'){capture();rows.push({storage:storages[0]||rows[0]?.storage||'128GB',color:colors[0]||rows[0]?.color||'Black',price:0,marketPrice:0,stock:1,batteryHealth:'',cycleCount:''});draw()}
+  const b=e.target.closest('[data-remove-unit]');if(b){capture();if(rows.length>1){rows.splice(Number(b.dataset.removeUnit),1);draw()}}
+ });
+ form.gpReadVariantOptions=()=>{capture();return rows.map(r=>({storage:String(r.storage||'').trim(),color:String(r.color||'').trim(),price:number(r.price),marketPrice:number(r.marketPrice),stock:number(r.stock),batteryHealth:r.batteryHealth===''?'':String(Math.min(100,number(r.batteryHealth))),cycleCount:r.cycleCount===''?'':String(number(r.cycleCount))})).filter(r=>r.storage&&r.color&&r.price>0)};
  draw();
 }
 window.GPVariants={mountEditor};
