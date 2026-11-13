@@ -1,1 +1,10 @@
-const CACHE='gp-shell-v2';const SHELL=['/','/index.html','/gp-app-icon.svg','/manifest.webmanifest'];self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()).catch(()=>self.skipWaiting()))});self.addEventListener('activate',event=>{event.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('gp-shell-')&&key!==CACHE).map(key=>caches.delete(key)))),self.clients.claim()]))});self.addEventListener('fetch',event=>{const req=event.request;if(req.method!=='GET')return;if(req.mode==='navigate'){event.respondWith(fetch(req).then(res=>{if(res.ok&&new URL(req.url).origin===self.location.origin){const copy=res.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)))}return res}).catch(()=>caches.match(req).then(cached=>cached||caches.match('/index.html'))));return}if(new URL(req.url).origin===self.location.origin&&(/\.(?:svg|png|webmanifest)$/.test(new URL(req.url).pathname))){event.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(res=>{if(res.ok){const copy=res.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)))}return res})))}});
+const CACHE='gp-shell-v3-no-login';
+self.addEventListener('install',event=>{event.waitUntil(self.skipWaiting())});
+self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('gp-shell-')).map(k=>caches.delete(k)));await self.clients.claim()})())});
+self.addEventListener('fetch',event=>{
+ const req=event.request;
+ if(req.method!=='GET')return;
+ if(req.mode==='navigate'){
+  event.respondWith(fetch(new Request(req,{cache:'no-store'})).catch(async()=>{const cached=await caches.match(req);return cached||Response.error()}));
+ }
+});
