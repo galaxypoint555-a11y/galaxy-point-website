@@ -56,5 +56,24 @@ function mountEditor(form,product){
  form.gpReadVariantOptions=()=>{capture();return rows.map(r=>({storage:String(r.storage||'').trim(),color:String(r.color||'').trim(),price:number(r.price),marketPrice:number(r.marketPrice),stock:number(r.stock),batteryHealth:r.batteryHealth===''?'':String(Math.min(100,number(r.batteryHealth))),cycleCount:r.cycleCount===''?'':String(number(r.cycleCount))})).filter(r=>r.storage&&r.color&&r.price>0)};
  draw();
 }
-window.GPVariants={mountEditor};
+const selected=new Map(),selectedUnit=new Map(),selectedCondition=new Map();
+const variants=p=>Array.isArray(p?.variantOptions)?p.variantOptions.filter(r=>r&&r.storage&&r.color&&Number(r.price)>0):[];
+const choice=p=>{const a=variants(p),v=selected.get(String(p.id))||{};return a.find(r=>(!v.storage||r.storage===v.storage)&&(!v.color||r.color===v.color))||a[0]||null};
+const unit=p=>{const a=variants(p),i=selectedUnit.get(String(p.id));return Number.isInteger(i)&&a[i]?a[i]:choice(p)};
+const selection=p=>unit(p);
+const stock=(p,v)=>Math.max(0,Number((v||unit(p))?.stock??p.stock??0));
+const marketPrice=(p,v)=>Number((v||unit(p))?.marketPrice??p.marketPrice??0);
+const condition=p=>Number(p?.conditionPrices?.bestValue)>0?'Best Value':null;
+const chooseCondition=(p,name)=>{if(name==='Best Value')selectedCondition.set(String(p.id),name)};
+const displayPrice=(p,v)=>Number(p?.conditionPrices?.bestValue)>0?Number(p.conditionPrices.bestValue):Number((v||unit(p))?.price??p.price??0);
+const picker=p=>{const a=variants(p);if(!a.length)return '';const v=selection(p),storages=[...new Set(a.map(r=>r.storage))],colors=[...new Set(a.filter(r=>r.storage===(v?.storage||storages[0])).map(r=>r.color))];return '<div class="gp-variant-picker"><div class="gp-vlabel">Storage</div>'+storages.map(x=>'<button type="button" class="gp-variant-option" data-v-storage="'+esc(x)+'" aria-pressed="'+(x===v?.storage)+'">'+esc(x)+'</button>').join('')+'<div class="gp-vlabel">Colour</div>'+colors.map(x=>'<button type="button" class="gp-variant-option" data-v-color="'+esc(x)+'" aria-pressed="'+(x===v?.color)+'">'+esc(x)+'</button>').join('')+'</div>'};
+const unitPicker=p=>{const a=variants(p),v=selection(p);if(!v)return '';const matches=a.map((r,i)=>({...r,i})).filter(r=>r.storage===v.storage&&r.color===v.color);return matches.length>1?'<div class="gp-vlabel">Available Units</div>'+matches.map(r=>'<button type="button" class="gp-variant-option" data-v-unit="'+r.i+'">'+(r.batteryHealth?esc(r.batteryHealth)+'% Battery':'Unit '+(r.i+1))+'</button>').join(''):''};
+const batteryInfo=p=>{const r=unit(p);return r&&r.batteryHealth!==''&&r.batteryHealth!=null?'<p class="gp-battery-info">Battery Health: '+esc(r.batteryHealth)+'%'+(r.cycleCount!==''&&r.cycleCount!=null?' · Cycle Count: '+esc(r.cycleCount):'')+'</p>':''};
+const choose=(p,type,value)=>{const key=String(p.id),v={...(selected.get(key)||{})};v[type]=value;selected.set(key,v);selectedUnit.delete(key)};
+const chooseUnit=(p,i)=>{if(variants(p)[i]){selectedUnit.set(String(p.id),i);selected.set(String(p.id),{storage:variants(p)[i].storage,color:variants(p)[i].color})}};
+const key=(p)=>String(p.id)+(unit(p)?'::'+variants(p).indexOf(unit(p)):'');
+const resolve=(items,k)=>{const [id,idx]=String(k).split('::'),p=items.find(x=>String(x.id)===id);if(!p)return null;const r=idx!==undefined?variants(p)[Number(idx)]:unit(p);return {p,price:displayPrice(p,r),stock:stock(p,r),name:p.name||p.title,variant:r}};
+const conditionPicker=p=>condition(p)?'<div class="gp-condition-choice"><div class="gp-vlabel">Condition <button type="button" data-condition-learn="1">Learn More</button></div><button type="button" data-condition-pick="Best Value">Best Value</button><p>Good Condition · Condition: Just Like New</p></div>':'';
+const conditionDetails=()=>'<div class="gp-condition-guide"><h3>Best Value — Condition Guide</h3><p>Good Condition</p><p>Condition: Just Like New</p></div>';
+window.GPVariants={mountEditor,selection,unit,stock,marketPrice,condition,chooseCondition,displayPrice,picker,unitPicker,batteryInfo,choose,chooseUnit,key,resolve,conditionPicker,conditionDetails};
 })();
