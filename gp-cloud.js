@@ -61,6 +61,7 @@ window.GPCloud=(()=>{
   }
   function active(){return Boolean(session?.access_token&&user&&role);}
   function guard(){if(!active())throw Error('Sign in with an authorized staff account first.');}
+  async function productById(id){guard();return request('/rest/v1/products?select=*&id=eq.'+q(id)+'&limit=1');}
   async function products(){guard();const rows=await request('/rest/v1/products?select=*&order=created_at.desc&limit=500');return rows.map(p=>({...p,name:p.title,price:p.price_inr,condition:p.condition||'Pre-owned',is_published:p.is_published??p.active??false}));}
   async function settings(){guard();const rows=await request('/rest/v1/website_settings?select=key,value');return Object.fromEntries(rows.map(x=>[x.key,x.value]));}
   async function saveSettings(fields){guard();return request('/rest/v1/website_settings?on_conflict=key',{method:'POST',body:Object.entries(fields).map(([key,value])=>({key,value})),extra:{Prefer:'resolution=merge-duplicates,return=minimal'}});}
@@ -88,5 +89,5 @@ window.GPCloud=(()=>{
   }
   function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});}
   function clean(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-  return{cfg,configured,request,ensureSession,signIn,signOut,active,products,settings,saveSettings,upsertProduct,removeProduct,orders,updateOrderStatus,upload,money,clean,get user(){return user;},get role(){return role;}};
+  return{cfg,configured,request,ensureSession,signIn,signOut,active,products,productById,settings,saveSettings,upsertProduct,removeProduct,orders,updateOrderStatus,upload,money,clean,get user(){return user;},get role(){return role;}};
 })();
