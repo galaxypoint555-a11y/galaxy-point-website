@@ -534,7 +534,7 @@ async function gpRefreshLive(){
  if(document.hidden||page==='checkout'||page==='cart')return;
  if(Date.now()-gpLastSync<1800)return;
  gpLastSync=Date.now();
- await Promise.allSettled([gpLoadSiteSettings(),gpLoadPublishedCatalog()]);
+ await gpLoadSiteSettings(); await gpLoadPublishedCatalog();
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)gpRefreshLive()});
 window.addEventListener('focus',gpRefreshLive);
