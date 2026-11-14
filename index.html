@@ -496,7 +496,7 @@ async function gpLoadPublishedCatalog(){
   if(nextSignature!==window.gpCatalogSignature){window.gpCatalogSignature=nextSignature;items=nextItems;show();if(page==='home')gpRefreshFeaturedDeals();}
  }catch(err){console.warn('Galaxy Point catalog sync unavailable; hiding outdated sample products.',err);if(!window.gpCatalogSignature){items=[];show();}}
 }
-gpLoadPublishedCatalog();
+// Initial catalog load waits for settings so images and videos use the latest metadata.
 
 function gpUpdateDropTimer(){const h=document.getElementById('gpDropHours');if(!h)return;const period=43200000,remaining=period-Date.now()%period;h.textContent=String(Math.floor(remaining/3600000)).padStart(2,'0');document.getElementById('gpDropMinutes').textContent=String(Math.floor(remaining%3600000/60000)).padStart(2,'0');document.getElementById('gpDropSeconds').textContent=String(Math.floor(remaining%60000/1000)).padStart(2,'0')}
 setInterval(gpUpdateDropTimer,1000);
@@ -526,7 +526,7 @@ async function gpLoadSiteSettings(){
   else if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;setupStoreVideo();}
  }catch(err){console.warn('Galaxy Point site settings unavailable',err);window.gpVideoSettingsLoaded=true;if(page==='home'&&!window.gpInitialVideoReady){window.gpInitialVideoReady=true;show();}}
 }
-gpLoadSiteSettings();
+gpLoadSiteSettings().then(gpLoadPublishedCatalog);
 // Fast cloud sync: refresh when customers return to the tab and while it stays open.
 // Avoid refreshing during checkout to preserve in-progress form data.
 let gpLastSync=Date.now();
