@@ -8,6 +8,7 @@ const publicSwatches={Black:'#17191e',White:'#f4f4f2',Silver:'#c6c9cc',Blue:'#36
 function mountEditor(form,product){
  const host=form.querySelector('#gp-variant-manager');if(!host)return;
  let rows=(Array.isArray(product?.variantOptions)?product.variantOptions:[]).map(r=>({...r}));
+ let lastEditedUnit=-1;
  if(!rows.length)rows=[{storage:product?.storage||'128GB',color:String(product?.color||'Black').split(',')[0].trim(),price:product?.price||0,marketPrice:product?.marketPrice||0,stock:product?.stock??1,batteryHealth:'',cycleCount:''}];
  let colors=[...new Set([...String(product?.color||'').split(',').map(x=>x.trim()).filter(Boolean),...rows.map(r=>r.color).filter(Boolean)])];
  let storages=[...new Set(rows.map(r=>r.storage).filter(Boolean))];
@@ -46,14 +47,14 @@ function mountEditor(form,product){
   host.querySelectorAll('[data-unit]').forEach(discount);
  }
  function discount(card){const p=Number(card.querySelector('[data-k="price"]').value),m=Number(card.querySelector('[data-k="marketPrice"]').value);card.querySelector('[data-discount]').textContent=m>p&&p>=0?Math.round((m-p)/m*100)+'% OFF':'—';}
- host.addEventListener('input',e=>{const card=e.target.closest('[data-unit]');if(card)discount(card)});
+ host.addEventListener('input',e=>{const card=e.target.closest('[data-unit]');if(card){if(e.target.matches('[data-k="price"]'))lastEditedUnit=Number(card.dataset.unit);discount(card)}});
  host.addEventListener('change',e=>{if(e.target.matches('[data-choice]')){capture();draw()}});
  host.addEventListener('click',e=>{
   if(e.target.id==='gp-add-color'){const v=host.querySelector('#gp-custom-color').value.trim();if(v){capture();colors=[...new Set([...colors,v])];draw()}}
   if(e.target.id==='gp-add-unit'){capture();rows.push({storage:storages[0]||rows[0]?.storage||'128GB',color:colors[0]||rows[0]?.color||'Black',price:0,marketPrice:0,stock:1,batteryHealth:'',cycleCount:''});draw()}
   const b=e.target.closest('[data-remove-unit]');if(b){capture();if(rows.length>1){rows.splice(Number(b.dataset.removeUnit),1);draw()}}
  });
- form.gpReadVariantOptions=()=>{capture();return rows.map(r=>({storage:String(r.storage||'').trim(),color:String(r.color||'').trim(),price:number(r.price),marketPrice:number(r.marketPrice),stock:number(r.stock),batteryHealth:r.batteryHealth===''?'':String(Math.min(100,number(r.batteryHealth))),cycleCount:r.cycleCount===''?'':String(number(r.cycleCount))})).filter(r=>r.storage&&r.color&&r.price>0)};
+ form.gpReadVariantOptions=()=>{capture();const valid=rows.map(r=>({storage:String(r.storage||'').trim(),color:String(r.color||'').trim(),price:number(r.price),marketPrice:number(r.marketPrice),stock:number(r.stock),batteryHealth:r.batteryHealth===''?'':String(Math.min(100,number(r.batteryHealth))),cycleCount:r.cycleCount===''?'':String(number(r.cycleCount))})).filter(r=>r.storage&&r.color&&r.price>0);if(lastEditedUnit>=0){const edited=rows[lastEditedUnit];const matched=valid.find(r=>r.storage===String(edited?.storage||'').trim()&&r.color===String(edited?.color||'').trim()&&r.price===number(edited?.price));if(matched)return [matched,...valid.filter(r=>r!==matched)]}return valid};
  draw();
 }
 const selected=new Map(),selectedUnit=new Map(),selectedCondition=new Map();
