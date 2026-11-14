@@ -523,31 +523,46 @@ $('reset-preview').onclick=async()=>{if(!confirm('Reload live data and discard u
 })();
 </script>
 <script>
-/* Check for a deployed editor version without interrupting unsaved product edits. */
+/* Detect every deployed editor change without requiring a manual refresh.
+   Compare the actual loaded document source, not the old static gp-build tag. */
 (function(){
-  const current=document.querySelector('meta[name="gp-build"]')?.content;
-  if(!current)return;
-  let notified=false;
+  const getSignature=(doc)=>{
+    const parts=[doc.title,doc.querySelector('meta[name="gp-build"]')?.content||''];
+    doc.querySelectorAll('style,script').forEach(el=>parts.push(el.textContent||''));
+    let h=2166136261;
+    const source=parts.join('\u0000');
+    for(let i=0;i<source.length;i++){h^=source.charCodeAt(i);h=Math.imul(h,16777619)}
+    return h>>>0;
+  };
+  const current=getSignature(document);
+  let checking=false;
   const banner=document.createElement('div');
   banner.id='gp-update-notice';
-  banner.style.cssText='display:none;position:fixed;top:18px;right:18px;z-index:999999;background:#17243d;color:white;border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px #0003;font:13px system-ui;max-width:340px';
-  banner.innerHTML='<span>New Editor update available.</span> <button type="button" style="margin-left:8px;background:#fff;color:#17243d;border:0;border-radius:7px;padding:7px 10px;cursor:pointer;font-weight:700">Refresh now</button>';
+  banner.setAttribute('role','status');
+  banner.style.cssText='display:none;position:fixed;top:18px;right:18px;z-index:999999;background:linear-gradient(115deg,#0d705f,#174a83);color:white;border-radius:14px;padding:14px 16px;box-shadow:0 10px 34px #102d4a45;font:13px system-ui;max-width:360px';
+  banner.innerHTML='<strong style="display:block;font-size:14px">✓ Editor Update Available</strong><span>New changes are ready. Click to update the Editor.</span> <button type="button" style="display:block;margin-top:10px;background:#fff;color:#134a70;border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:800">Update Now</button>';
   document.body.appendChild(banner);
-  banner.querySelector('button').onclick=()=>location.reload();
+  banner.querySelector('button').addEventListener('click',()=>{
+    if(document.querySelector('#editor-overlay.open')&&!confirm('An edit window is open. Unsaved changes may be lost. Update Editor now?'))return;
+    const url=new URL(location.href);url.searchParams.set('gp_editor_version',String(Date.now()));
+    location.replace(url.href);
+  });
   async function check(){
-    if(document.hidden||notified)return;
+    if(document.hidden||checking||banner.style.display==='block')return;
+    checking=true;
     try{
-      const response=await fetch(location.pathname+'?gp_update_check='+Date.now(),{cache:'no-store'});
+      const response=await fetch(location.pathname+'?gp_update_check='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
       if(!response.ok)return;
       const html=await response.text();
-      const next=html.match(/<meta name="gp-build" content="([^"]+)"/)?.[1];
-      if(!next||next===current)return;
-      notified=true;
-      banner.style.display='block';
-    }catch(e){}
+      if(!html.includes('gp-product-editor'))return;
+      const next=getSignature(new DOMParser().parseFromString(html,'text/html'));
+      if(next!==current)banner.style.display='block';
+    }catch(e){}finally{checking=false}
   }
-  setInterval(check,20000);
+  setInterval(check,15000);
+  window.addEventListener('focus',check);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+  setTimeout(check,3500);
 })();
 </script>
 </body></html>
