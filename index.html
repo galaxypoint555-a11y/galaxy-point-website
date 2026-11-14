@@ -538,7 +538,30 @@ async function gpRefreshLive(){
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)gpRefreshLive()});
 window.addEventListener('focus',gpRefreshLive);
-setInterval(gpRefreshLive,60000); // Reduce Supabase requests; focus/visibility still refresh immediately.
+setInterval(gpRefreshLive,60000); // Low-bandwidth fallback if realtime is unavailable.
+// Instant cross-tab sync on the same browser, including when Editor publishes changes.
+let gpLiveChannel=null;
+try{gpLiveChannel=new BroadcastChannel('gp-product-live-updates');gpLiveChannel.onmessage=e=>{if(e.data?.type==='product-saved')gpRefreshLive()}}catch(_e){}
+window.addEventListener('storage',e=>{if(e.key==='gp-product-published-at')gpRefreshLive()});
+// Supabase Realtime: receive product table changes without repeatedly downloading the catalog.
+(function gpConnectProductRealtime(){
+ const cfg=window.GP_CONFIG;if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey||!window.WebSocket)return;
+ let ws=null,heartbeat=null,retry=null,delay=2000,active=false;
+ const send=msg=>{if(ws?.readyState===WebSocket.OPEN)ws.send(JSON.stringify(msg))};
+ const connect=()=>{
+  if(document.hidden){retry=setTimeout(connect,5000);return}
+  try{
+   const endpoint=cfg.supabaseUrl.replace(/^http/,'ws').replace(/\\/$/,'')+'/realtime/v1/websocket?apikey='+encodeURIComponent(cfg.supabaseAnonKey)+'&vsn=1.0.0';
+   ws=new WebSocket(endpoint);
+   ws.onopen=()=>{delay=2000;send({topic:'realtime:public:products',event:'phx_join',payload:{config:{broadcast:{self:false},presence:{key:''},postgres_changes:[{event:'*',schema:'public',table:'products'}]}},ref:'gp-products'});heartbeat=setInterval(()=>send({topic:'phoenix',event:'heartbeat',payload:{},ref:'gp-heartbeat'}),25000)};
+   ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.event==='postgres_changes'||(m.event==='phx_reply'&&m.payload?.response?.postgres_changes?.length&&m.payload?.status==='ok')){if(m.event==='postgres_changes')gpRefreshLive()}}catch(_e){}};
+   ws.onclose=()=>{clearInterval(heartbeat);if(!active){retry=setTimeout(connect,delay);delay=Math.min(delay*2,60000)}};
+   ws.onerror=()=>ws?.close();
+  }catch(_e){retry=setTimeout(connect,delay);delay=Math.min(delay*2,60000)}
+ };
+ connect();
+ window.addEventListener('pagehide',()=>{active=true;clearTimeout(retry);clearInterval(heartbeat);ws?.close()},{once:true});
+})();
 
 })();
 </script><div id="gpInstallPrompt" class="gp-install-prompt" hidden><img src="/gp-app-icon.svg?v=uploaded-trace-5" alt="Galaxy Point"><div class="gp-install-copy"><strong>Install Galaxy Point</strong><small>Get quick access from your home screen</small></div><button id="gpInstallAction" class="gp-install-action" type="button">Install</button><button id="gpInstallDismiss" class="gp-install-dismiss" type="button" aria-label="Dismiss">×</button></div><script>
