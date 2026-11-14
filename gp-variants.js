@@ -29,7 +29,6 @@ function mountEditor(form,product){
   }
  }
  function draw(){
-  ensureSelectedUnits();
   const allColors=[...new Set([...palette.map(x=>x[0]),...colors])];
   const allStorage=[...new Set([...storageOptions,...storages])];
   const colorHtml=allColors.map(c=>check('color',c,colors.includes(c))).join('')+'<div class="field" style="margin-top:10px"><label>Add custom colour</label><input id="gp-custom-color" placeholder="Colour name"><button type="button" class="btn" id="gp-add-color">+ Add Colour</button></div>';
