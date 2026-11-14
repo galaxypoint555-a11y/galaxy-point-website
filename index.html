@@ -538,7 +538,7 @@ async function gpRefreshLive(){
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)gpRefreshLive()});
 window.addEventListener('focus',gpRefreshLive);
-setInterval(gpRefreshLive,8000);
+setInterval(gpRefreshLive,60000); // Reduce Supabase requests; focus/visibility still refresh immediately.
 
 })();
 </script><div id="gpInstallPrompt" class="gp-install-prompt" hidden><img src="/gp-app-icon.svg?v=uploaded-trace-5" alt="Galaxy Point"><div class="gp-install-copy"><strong>Install Galaxy Point</strong><small>Get quick access from your home screen</small></div><button id="gpInstallAction" class="gp-install-action" type="button">Install</button><button id="gpInstallDismiss" class="gp-install-dismiss" type="button" aria-label="Dismiss">×</button></div><script>
