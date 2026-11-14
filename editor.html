@@ -247,7 +247,7 @@ const gpStorageKnown=gpStorageMatch?gpStorageMatch[1].toUpperCase():'';gpStorage
 function gpUpdateVariantControls(){const category=String(form.elements.category.value||'');const mobile=category==='iPhone'||category==='Samsung'||category==='Android';const android=category==='Samsung'||category==='Android';gpStorageSelect.hidden=!mobile;gpRamField.hidden=!android;if(!mobile){gpStorageCustom.hidden=false;gpStorageCustom.placeholder='Enter variant / storage';gpStorageCustom.value=gpStorageCustom.value||gpInitialVariant}else{gpStorageCustom.hidden=gpStorageSelect.value!=='other';if(gpStorageSelect.value==='other'&&!gpStorageCustom.value)gpStorageCustom.value=gpInitialVariant;gpRamCustom.hidden=gpRamSelect.value!=='other'}}
 gpStorageSelect.addEventListener('change',gpUpdateVariantControls);gpRamSelect.addEventListener('change',gpUpdateVariantControls);form.elements.category.addEventListener('change',gpUpdateVariantControls);gpUpdateVariantControls();window.GPVariants.mountEditor(form,v);
 const gpBestValueInput=form.elements.conditionBestValuePrice;
-const gpSyncBestValuePrice=()=>{const price=form.querySelector('#gp-variant-manager [data-unit] [data-k="price"]');const value=price?.value?.trim();gpBestValueInput.value=value!==undefined&&value!==''?value:String(form.elements.price.value||'');};
+const gpSyncBestValuePrice=()=>{const price=form.querySelector('#gp-variant-manager [data-unit] [data-k="price"]');const value=price?.value?.trim();gpBestValueInput.value=value!==undefined&&value!==''?value:String(form.elements.price.value||'');if(value!==undefined&&value!=='')form.elements.price.value=value;};
 form.querySelector('#gp-variant-manager').addEventListener('input',gpSyncBestValuePrice);
 form.querySelector('#gp-variant-manager').addEventListener('change',gpSyncBestValuePrice);
 gpSyncBestValuePrice();
@@ -425,7 +425,7 @@ const gpProductVideoInput=$('gp-product-video'),gpProductVideoBox=$('gp-video-pr
 let gpVideoPreviewURL=null;
 function gpRenderProductVideoPreview(src){
  gpProductVideoBox.replaceChildren();
- if(!src){gpVideoStatus.textContent='No product video selected. Add an MP4 video to preview it here.';return}
+ if(!src){gpVideoStatus.textContent='No product video selected. Add an MP4 video to preview it here.';return}gpVideoStatus.textContent=src.startsWith('blob:')?'✓ Video selected — preview below. Save product to upload.':'✓ Previously uploaded video — preview below.';
  const wrap=document.createElement('div');wrap.className='gp-video-removable';
  const video=document.createElement('video');video.src=src;video.controls=true;video.muted=true;video.playsInline=true;video.preload='metadata';video.style.cssText='display:block;width:100%;max-width:360px;max-height:240px;object-fit:contain;border-radius:12px;background:#101827';
  video.onloadedmetadata=()=>{gpVideoStatus.textContent='✓ Video ready to preview · '+Math.round(video.duration||0)+' seconds. Click Save Changes to publish.'};
