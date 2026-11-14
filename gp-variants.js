@@ -9,7 +9,7 @@ function mountEditor(form,product){
  const host=form.querySelector('#gp-variant-manager');if(!host)return;
  let rows=(Array.isArray(product?.variantOptions)?product.variantOptions:[]).map(r=>({...r}));
  let lastEditedUnit=-1;
- if(!rows.length)rows=[{storage:product?.storage||'128GB',color:String(product?.color||'Black').split(',')[0].trim(),price:product?.price||0,marketPrice:product?.marketPrice||0,stock:product?.stock??1,batteryHealth:'',cycleCount:''}];
+ if(!rows.length)rows=[{storage:product?.storage||'',color:String(product?.color||'').split(',')[0].trim(),price:product?.price||0,marketPrice:product?.marketPrice||0,stock:product?.stock??1,batteryHealth:'',cycleCount:''}];
  let colors=[...new Set([...String(product?.color||'').split(',').map(x=>x.trim()).filter(Boolean),...rows.map(r=>r.color).filter(Boolean)])];
  let storages=[...new Set(rows.map(r=>r.storage).filter(Boolean))];
  const section=(title,body)=>'<section style="background:#fff;border:1px solid #e3e8f1;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 3px 14px rgba(20,40,80,.04)"><h3 style="margin:0 0 12px;font-size:16px">'+title+'</h3>'+body+'</section>';
@@ -52,7 +52,7 @@ function mountEditor(form,product){
  host.addEventListener('change',e=>{if(e.target.matches('[data-choice]')){capture();draw()}});
  host.addEventListener('click',e=>{
   if(e.target.id==='gp-add-color'){const v=host.querySelector('#gp-custom-color').value.trim();if(v){capture();colors=[...new Set([...colors,v])];draw()}}
-  if(e.target.id==='gp-add-unit'){capture();rows.push({storage:storages[0]||rows[0]?.storage||'128GB',color:colors[0]||rows[0]?.color||'Black',price:0,marketPrice:0,stock:1,batteryHealth:'',cycleCount:''});draw()}
+  if(e.target.id==='gp-add-unit'){capture();rows.push({storage:storages[0]||rows[0]?.storage||'',color:colors[0]||rows[0]?.color||'',price:0,marketPrice:0,stock:1,batteryHealth:'',cycleCount:''});draw()}
   const b=e.target.closest('[data-remove-unit]');if(b){capture();if(rows.length>1){rows.splice(Number(b.dataset.removeUnit),1);draw()}}
  });
  form.gpReadVariantOptions=()=>{capture();const valid=rows.map(r=>({storage:String(r.storage||'').trim(),color:String(r.color||'').trim(),price:number(r.price),marketPrice:number(r.marketPrice),stock:number(r.stock),batteryHealth:r.batteryHealth===''?'':String(Math.min(100,number(r.batteryHealth))),cycleCount:r.cycleCount===''?'':String(number(r.cycleCount)),region:['Indian','Global'].includes(r.region)?r.region:''})).filter(r=>r.storage&&r.color&&r.price>0);if(lastEditedUnit>=0){const edited=rows[lastEditedUnit];const matched=valid.find(r=>r.storage===String(edited?.storage||'').trim()&&r.color===String(edited?.color||'').trim()&&r.price===number(edited?.price));if(matched)return [matched,...valid.filter(r=>r!==matched)]}return valid};
