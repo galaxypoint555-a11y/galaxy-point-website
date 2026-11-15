@@ -25,10 +25,20 @@ window.GPCloud=(()=>{
     }
     const send=()=>fetch(base()+path,{method,headers:headers(auth,extra),body:body===undefined?undefined:(raw?body:JSON.stringify(body))});
     let res=await send();
-    if(auth&&!isAuthEndpoint&&res.status===401&&session?.refresh_token){
-      try{await renewSession();res=await send()}catch(e){saveSession(null);throw e}
+    // Supabase/PostgREST can reject an expired JWT with 400/403 as well as 401.
+    // Inspect the error body, refresh once, and retry the original request without
+    // discarding the editor form or asking staff to re-enter product information.
+    let txt=await res.text();let data=null;try{data=txt?JSON.parse(txt):null;}catch{data=txt;}
+    const authError=()=>/exp.*claim.*timestamp|jwt.*expir|token.*expir|invalid.*jwt/i.test(
+      [data?.message,data?.error_description,data?.msg,data?.error,typeof data==='string'?data:''].filter(Boolean).join(' '));
+    if(auth&&!isAuthEndpoint&&session?.refresh_token&&!res.ok&&(res.status===401||authError())){
+      try{
+        await renewSession();
+        res=await send();
+        txt=await res.text();
+        try{data=txt?JSON.parse(txt):null;}catch{data=txt;}
+      }catch(e){throw Error('Session renewal failed. Please sign in again without closing this product form. '+e.message)}
     }
-    const txt=await res.text();let data=null;try{data=txt?JSON.parse(txt):null;}catch{data=txt;}
     if(!res.ok)throw Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+res.status+')');
     return data;
   }
