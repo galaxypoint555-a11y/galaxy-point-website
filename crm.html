@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Galaxy Point CRM</title>
+  <link rel="icon" href="gp-logo.svg" type="image/svg+xml">
+  <style>
+    :root{--navy:#142746;--blue:#355fe8;--blue-soft:#edf2ff;--ink:#1c2b43;--muted:#77849a;--line:#e6ebf2;--bg:#f5f7fb;--green:#138763;--green-soft:#e8f7f0;--amber:#b87913;--amber-soft:#fff5df;--red:#bd4952;--red-soft:#fff0f1;--card:#fff;--radius:16px;--shadow:0 8px 28px rgba(29,48,82,.06)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,Segoe UI,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.shell{min-height:100vh;display:flex}.sidebar{width:250px;background:#fff;border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column;gap:24px}.brand{display:flex;align-items:center;gap:12px;padding:0 8px 20px;border-bottom:1px solid var(--line)}.brand img{width:40px;height:40px;object-fit:contain}.brand b{font-size:16px;letter-spacing:-.3px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1px;margin-top:2px}.navlabel{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#9aa5b5;padding:0 11px 8px}.nav{display:grid;gap:6px}.nav a{display:flex;gap:12px;align-items:center;padding:12px 13px;border-radius:11px;color:#68768d;font-weight:650}.nav a.active,.nav a:hover{background:var(--blue-soft);color:#3155c8}.nav .icon{width:18px;text-align:center}.foot{margin-top:auto;padding:14px 10px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.main{min-width:0;flex:1}.top{height:74px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;gap:16px}.crumb{font-size:12px;color:var(--muted)}.crumb b{color:var(--ink)}.topright{display:flex;align-items:center;gap:16px}.live{display:flex;align-items:center;gap:7px;color:#73819a;font-size:11px}.dot{width:8px;height:8px;border-radius:50%;background:#27ad7e;box-shadow:0 0 0 4px #27ad7e1b}.user{font-weight:700;font-size:12px}.role{display:block;color:var(--muted);font-size:10px;font-weight:500}.content{max-width:1500px;margin:auto;padding:30px}.pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}.pagehead h1{margin:0;font-size:28px;letter-spacing:-.8px}.pagehead p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.date{height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 11px;color:#40516a}.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:750;font-size:12px}.btn.primary{background:var(--blue);color:#fff;box-shadow:0 5px 14px #355fe82c}.btn.ghost{background:#fff;border:1px solid var(--line);color:#52627a}.btn.small{padding:8px 10px;border-radius:8px}.btn.good{background:var(--green-soft);color:var(--green)}.btn:hover{filter:brightness(.98)}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.card{padding:18px 19px;min-height:120px}.cardtop{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11px;font-weight:650}.badgeicon{width:31px;height:31px;border-radius:10px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-size:15px}.value{font-size:29px;line-height:1.15;font-weight:850;letter-spacing:-1px;margin-top:12px}.subvalue{font-size:10px;color:var(--muted);margin-top:5px}.panel{padding:20px;margin-top:16px}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.panelhead h2{margin:0;font-size:15px;letter-spacing:-.2px}.hint{color:var(--muted);font-size:11px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th{text-align:left;padding:11px 12px;color:#8793a6;font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--line);white-space:nowrap}td{padding:13px 12px;border-bottom:1px solid #eff2f6;font-size:12px;vertical-align:middle}tr:last-child td{border-bottom:0}.name{font-weight:750;color:#243650}.phone{font-size:11px;color:#728099;margin-top:2px}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:750;white-space:nowrap;background:#f0f2f6;color:#68758a}.pill.green{background:var(--green-soft);color:var(--green)}.pill.amber{background:var(--amber-soft);color:var(--amber)}.pill.blue{background:var(--blue-soft);color:#3458ca}.pill.red{background:var(--red-soft);color:var(--red)}.src{font-weight:700;color:#53627a}.smallmuted{font-size:10px;color:var(--muted);margin-top:3px}.formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.field{display:grid;gap:6px}.field label{font-size:10px;font-weight:750;letter-spacing:.45px;color:#6d7a90}.field input,.field select,.field textarea{width:100%;border:1px solid #dfe5ed;border-radius:9px;background:#fff;padding:10px 11px;color:var(--ink);outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#7691ef;box-shadow:0 0 0 3px #355fe814}.field textarea{min-height:72px;resize:vertical}.wide{grid-column:span 2}.formfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.sourcegrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.sourcebox{background:#fbfcfe;border:1px solid #edf0f5;border-radius:12px;padding:13px}.sourcebox span{display:block;color:var(--muted);font-size:10px}.sourcebox b{font-size:19px;display:block;margin-top:6px}.barrow{display:grid;grid-template-columns:130px 1fr 34px;gap:10px;align-items:center;margin:13px 0;font-size:11px}.barbg{height:8px;background:#edf0f6;border-radius:10px;overflow:hidden}.barfill{height:100%;background:linear-gradient(90deg,#7290fa,#355fe8);border-radius:10px}.barrow b{text-align:right}.empty{padding:28px;text-align:center;color:var(--muted);font-size:12px}.notice{padding:12px 14px;border-radius:11px;background:#fff7e7;border:1px solid #f1e2b9;color:#805c11;font-size:11px;margin-bottom:16px}.alert{padding:11px 14px;border-radius:10px;margin:12px 0;background:#eef4ff;color:#3454a7;font-size:12px}.alert.error{background:var(--red-soft);color:var(--red)}.loginwrap{min-height:calc(100vh - 74px);display:grid;place-items:center;padding:24px}.login{width:min(430px,100%);padding:28px}.login h1{font-size:25px;margin:0 0 7px}.login p{font-size:12px;color:var(--muted);margin:0 0 22px}.login .field{margin:13px 0}.table-status{border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:#fff;font-size:11px}.modalback{position:fixed;inset:0;background:#14274680;display:grid;place-items:center;padding:20px;z-index:10}.modal{width:min(460px,100%);background:#fff;border-radius:17px;box-shadow:0 30px 90px #10224544;padding:22px}.modal h2{margin:0 0 5px;font-size:18px}.modal p{margin:0 0 16px;color:var(--muted);font-size:11px}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}.hide{display:none!important}
+    @media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sourcegrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:720px){.shell{display:block}.sidebar{width:auto;padding:13px 15px;gap:12px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 4px 11px}.navlabel,.foot{display:none}.nav{display:flex;overflow:auto}.nav a{white-space:nowrap;padding:9px 11px}.top{height:60px;padding:0 16px}.content{padding:20px 14px}.pagehead{display:block}.actions{margin-top:14px}.cards{gap:9px}.card{padding:13px;min-height:104px}.value{font-size:24px}.cardtop{font-size:10px}.sourcegrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:14px}.formgrid{grid-template-columns:1fr}.wide{grid-column:span 1}.pagehead h1{font-size:24px}.live{display:none}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html"><img src="gp-logo.svg" alt=""><span><b>Galaxy Point</b><small>CRM WORKSPACE</small></span></a>
+      <div><div class="navlabel">Workspaces</div><nav class="nav" id="nav"></nav></div>
+      <div class="foot">Customer records are visible to authorized staff only.</div>
+    </aside>
+    <div class="main">
+      <header class="top"><div class="crumb">Galaxy Point <b> / <span id="crumb">CRM</span></b></div><div class="topright"><div class="live"><i class="dot"></i><span id="refreshStatus">Live connected</span></div><span class="user" id="userName">Galaxy Point<small class="role" id="userRole">Staff panel</small></span><button id="signOut" class="btn ghost small hide">Logout</button></div></header>
+      <main class="content" id="app" aria-live="polite"></main>
+    </div>
+  </div>
+  <div id="modal"></div>
+  <script src="gp-config.js"></script>
+  <script src="gp-cloud.js"></script>
+  <script>
+  (()=>{'use strict';
+    const C=window.GPCloud,$=s=>document.querySelector(s),app=$('#app'),nav=$('#nav');
+    const labels={instagram_message:'Instagram message',whatsapp_message:'WhatsApp message',whatsapp_call:'WhatsApp call',normal_call:'Normal call',justdial:'JustDial lead'};
+    const destLabels={service_center:'Service Center',sales_new:'Sales — New',sales_used:'Sales — Used',accessories:'Accessories'};
+    const statusLabels={forwarded:'Forward ho gaya',received:'Mil gaya',in_progress:'Kaam chal raha hai',bill_created:'Bill ban gaya',closed:'Complete',not_converted:'Deal nahi hui'};
+    let leads=[],interactions=[],bills=[],role='',screen='';
+    const esc=C.clean;
+    const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:2});
+    const dt=(v,short=false)=>v?new Date(v).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',...(short?{dateStyle:'medium'}:{dateStyle:'medium',timeStyle:'short'})}):'—';
+    const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date());
+    const isToday=v=>v&&new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date(v))===today();
+    const dateKey=v=>/^\d{4}-\d{2}-\d{2}$/.test(String(v||''))?String(v):new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date(v));
+    const selectedDate=()=>$('#dateFilter')?.value||today();
+    const isClosed=l=>l.status==='closed'||bills.some(b=>b.lead_id===l.id);
+    const pill=(text,cls='')=>'<span class="pill '+cls+'">'+esc(text)+'</span>';
+    function setNav(){
+      const items=role==='boss'?[['boss','▦','Boss dashboard'],['leads','☷','Saare leads'],['repair','⌁','Service Center']]:role==='service_center'?[['repair','⌁','Service Center']]:[['manager','＋','Lead add karein'],['leads','☷','Mere referrals']];
+      nav.innerHTML=items.map(x=>'<a href="#'+x[0]+'" data-screen="'+x[0]+'" class="'+(screen===x[0]?'active':'')+'"><span class="icon">'+x[1]+'</span>'+x[2]+'</a>').join('');
+      nav.querySelectorAll('[data-screen]').forEach(a=>a.onclick=e=>{e.preventDefault();screen=a.dataset.screen;render()});
+    }
+    function panelHead(title,hint,extra=''){return '<div class="panelhead"><div><h2>'+title+'</h2>'+(hint?'<div class="hint">'+hint+'</div>':'')+'</div>'+extra+'</div>'}
+    function statusClass(s){return s==='closed'?'green':s==='bill_created'||s==='in_progress'?'blue':s==='not_converted'?'red':'amber'}
+    function filteredLeads(){const d=selectedDate();return leads.filter(l=>dateKey(l.created_at)===d)}
+    function cards(items){return '<section class="cards">'+items.map(x=>'<article class="card"><div class="cardtop"><span>'+x.label+'</span><span class="badgeicon">'+x.icon+'</span></div><div class="value">'+x.value+'</div><div class="subvalue">'+x.sub+'</div></article>').join('')+'</section>'}
+    function sourceCards(rows){return '<div class="sourcegrid">'+Object.entries(labels).map(([k,v])=>'<div class="sourcebox"><span>'+v+'</span><b>'+rows.filter(l=>l.source===k).length+'</b></div>').join('')+'</div>'}
+    function leadTable(rows,admin=false){
+      if(!rows.length)return '<div class="empty">Is date ke liye koi CRM entry nahi.</div>';
+      return '<div class="tablewrap"><table><thead><tr><th>Customer ka naam</th><th>Source</th><th>Kisko forward hua</th><th>Kisne forward kiya</th><th>Response</th><th>Status</th><th>Bill</th><th>Entry time</th></tr></thead><tbody>'+rows.map(l=>{
+        const bill=bills.filter(b=>b.lead_id===l.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
+        return '<tr><td><div class="name">'+esc(l.customer_name)+'</div><div class="phone">'+esc(l.customer_phone)+'</div></td><td><span class="src">'+esc(labels[l.source]||l.source)+'</span></td><td>'+esc(destLabels[l.destination]||l.destination)+(l.forwarded_to?'<div class="smallmuted">'+esc(l.forwarded_to)+'</div>':'')+'</td><td>'+pill('Sohail · Social Media Manager','blue')+'</td><td>'+ (l.response_received_at?pill('Jawab mila','green'):pill('Jawab pending','amber'))+(l.response_note?'<div class="smallmuted">'+esc(l.response_note)+'</div>':'')+'</td><td>'+pill(statusLabels[l.status]||l.status,statusClass(l.status))+'</td><td>'+(bill?'<b>'+money(bill.amount_inr)+'</b><div class="smallmuted">'+esc(bill.bill_number)+'</div>':'—')+'</td><td>'+dt(l.created_at)+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+    }
+    function dateActions(){return '<div class="actions"><label class="hint" for="dateFilter">Date</label><input class="date" type="date" id="dateFilter" value="'+today()+'"><button class="btn ghost" id="refreshBtn">Refresh</button></div>'}
+    function pageHead(title,sub,actions=''){return '<div class="pagehead"><div><h1>'+title+'</h1><p>'+sub+'</p></div>'+actions+'</div>'}
+    function render(){
+      setNav();$('#userRole').textContent=role==='boss'?'Boss · Admin':role==='service_center'?'Service Center':'Social Media Manager';
+      $('#userName').childNodes[0].textContent=role==='boss'?'Boss':role==='service_center'?'Service Center':'Sohail';
+      $('#signOut').classList.remove('hide');
+      if(screen==='boss')renderBoss();else if(screen==='repair')renderRepair();else if(screen==='manager')renderManager();else renderLeads();
+      $('#dateFilter')?.addEventListener('change',()=>{if(screen==='boss')renderBoss();else if(screen==='leads')renderLeads()});
+      $('#refreshBtn')?.addEventListener('click',loadData);
+    }
+    function renderBoss(){
+      $('#crumb').textContent='Boss overview';
+      const rows=filteredLeads(),repair=rows.filter(l=>l.destination==='service_center'),closed=repair.filter(isClosed),newSales=rows.filter(l=>l.destination==='sales_new'),usedSales=rows.filter(l=>l.destination==='sales_used'),received=rows.filter(l=>l.response_received_at),pending=rows.filter(l=>!l.response_received_at),dayBills=bills.filter(b=>dateKey(b.bill_date)===selectedDate());
+      app.innerHTML=pageHead('Boss dashboard','Aaj ke customer leads, forwarding aur Service Center ka live update.',dateActions())+
+        cards([{label:'Aaj ke leads',value:rows.length,sub:'Alag-alag CRM entries',icon:'☷'},{label:'Service Center',value:repair.length,sub:closed.length+' complete / billed',icon:'⌁'},{label:'Sales — New / Used',value:newSales.length+' / '+usedSales.length,sub:'Dono ke counts alag',icon:'↗'},{label:'Jawab mila',value:received.length,sub:pending.length+' ka jawab pending',icon:'✓'}])+
+        '<section class="panel">'+panelHead('Lead kis source se aayi','Selected date par record ki gayi enquiries')+sourceCards(rows)+'</section>'+
+        '<section class="panel">'+panelHead('Service Center summary','Bill usi forwarded customer aur case se linked hai')+cards([{label:'Repair customers',value:repair.length,sub:'Sohail ne forward kiye',icon:'⌁'},{label:'Total complete',value:closed.length,sub:'Service Center cases',icon:'✓'},{label:'Bills bane',value:dayBills.length,sub:'Selected date par',icon:'▤'},{label:'Bill ki total rakam',value:money(dayBills.reduce((n,b)=>n+Number(b.amount_inr||0),0)),sub:'CRM mein record hue bills',icon:'₹'}])+'</section>'+
+        '<section class="panel">'+panelHead('Customer referrals','Customer ka naam aur number sirf authorized staff ko dikhega')+leadTable(rows,true)+'</section>';
+    }
+    function renderLeads(){
+      $('#crumb').textContent='Mere referrals';
+      const rows=filteredLeads();
+      app.innerHTML=pageHead('Mere referrals','Har customer ka response, Service Center case aur bill isi record se linked rahega.',dateActions())+
+        cards([{label:'Total customers',value:rows.length,sub:'Aaj ki CRM entries',icon:'☷'},{label:'Sales — New',value:rows.filter(l=>l.destination==='sales_new').length,sub:'New phone ki requirement',icon:'↗'},{label:'Sales — Used',value:rows.filter(l=>l.destination==='sales_used').length,sub:'Second-hand ki requirement',icon:'↗'},{label:'Service Center',value:rows.filter(l=>l.destination==='service_center').length,sub:rows.filter(l=>l.destination==='service_center'&&isClosed(l)).length+' complete / billed',icon:'⌁'}])+
+        '<section class="panel">'+panelHead('Forward kiye gaye customers','Service Center ka response aur bill yahin dikhega')+leadTable(rows)+'</section>';
+    }
+    function renderManager(){
+      $('#crumb').textContent='Lead entry';
+      const rows=filteredLeads();
+      app.innerHTML=pageHead('Lead add karein','Customer ka source select karein aur usko sahi team ko forward karein.')+
+        '<section class="panel">'+panelHead('Nayi customer enquiry','Customer ka naam aur mobile number zaroori hai. Har nayi requirement ke liye alag entry karein.')+
+        '<form id="leadForm"><div class="formgrid"><div class="field"><label>Customer ka naam</label><input name="customer_name" required maxlength="120" placeholder="Customer ka naam"></div><div class="field"><label>Mobile number</label><input name="customer_phone" required inputmode="tel" maxlength="20" placeholder="10-digit number"></div><div class="field"><label>Lead kahan se aayi?</label><select name="source" required>'+Object.entries(labels).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('')+'</select></div><div class="field"><label>Kisko forward karna hai?</label><select name="destination" required><option value="service_center">Service Center</option><option value="sales_new">Sales — New</option><option value="sales_used">Sales — Used</option><option value="accessories">Accessories</option></select></div><div class="field"><label>Team member (optional)</label><input name="forwarded_to" maxlength="120" placeholder="Team member ka naam"></div><div class="field"><label>Follow-up ka time (optional)</label><input name="follow_up_at" type="datetime-local"></div><div class="field wide"><label>Requirement / note</label><input name="notes" maxlength="2000" placeholder="Customer ki requirement"></div></div><div class="formfoot"><button class="btn primary" type="submit">Save karein karke forward karein</button></div></form></section>'+
+        '<section class="panel">'+panelHead('Aaj ke referrals','Save karein karte hi destination ke counts update honge.')+leadTable(rows)+'</section>';
+      $('#leadForm').onsubmit=saveLead;
+    }
+    function renderRepair(){
+      $('#crumb').textContent='Service Center';
+      const rows=filteredLeads().filter(l=>l.destination==='service_center');
+      const dayBills=bills.filter(b=>dateKey(b.bill_date)===selectedDate());
+      app.innerHTML=pageHead('Service Center','Case ka status update karein, Sohail ko response batayein aur bill isi customer ke naam par record karein.',dateActions())+
+        cards([{label:'Repair customers',value:rows.length,sub:'Selected date par aaye cases',icon:'⌁'},{label:'Kaam chal raha hai',value:rows.filter(l=>l.status==='in_progress'||l.status==='received').length,sub:'Service Center ke open cases',icon:'◷'},{label:'Total complete',value:rows.filter(isClosed).length,sub:'Complete ya bill ban chuka',icon:'✓'},{label:'Bills / amount',value:dayBills.length+' / '+money(dayBills.reduce((n,b)=>n+Number(b.amount_inr||0),0)),sub:'Selected date ke bills',icon:'₹'}])+
+        '<section class="panel">'+panelHead('Repair queue','Case number, customer aur bill ek hi referral se linked hain')+(rows.length?'<div class="tablewrap"><table><thead><tr><th>Customer / case</th><th>Source</th><th>Sohail ko response</th><th>Case status</th><th>Update</th><th>Bill</th></tr></thead><tbody>'+rows.map(l=>{
+          const bill=bills.filter(b=>b.lead_id===l.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
+          return '<tr><td><div class="name">'+esc(l.customer_name)+'</div><div class="phone">'+esc(l.customer_phone)+'</div><div class="smallmuted">Case '+esc(l.id.slice(0,8).toUpperCase())+' · Sohail ne forward kiya</div></td><td>'+esc(labels[l.source]||l.source)+'</td><td>'+(l.response_received_at?pill('Jawab de diya','green'):pill('Jawab pending','amber'))+(l.response_note?'<div class="smallmuted">'+esc(l.response_note)+'</div>':'')+'</td><td><select class="table-status" data-status="'+esc(l.id)+'">'+['received','in_progress','bill_created','closed','not_converted'].map(s=>'<option value="'+s+'" '+(l.status===s?'selected':'')+'>'+esc(statusLabels[s])+'</option>').join('')+'</select></td><td><input class="table-status" data-note="'+esc(l.id)+'" placeholder="Chhota update" value="'+esc(l.response_note||'')+'" maxlength="1000"><button class="btn ghost small" data-save="'+esc(l.id)+'">Save karein</button></td><td>'+(bill?'<b>'+money(bill.amount_inr)+'</b><div class="smallmuted">'+esc(bill.bill_number)+' · '+dt(bill.bill_date,true)+'</div>':'')+'<button class="btn '+(bill?'ghost':'primary')+' small" data-bill="'+esc(l.id)+'">'+(bill?'Bill add karein':'Bill banayein')+'</button></td></tr>';
+        }).join('')+'</tbody></table></div>':'<div class="empty">No Service Center cases for this date.</div>')+'</section>'+
+        '<section class="panel">'+panelHead('Aaj record hue bills','Har bill Service Center case se linked hai')+(dayBills.length?'<div class="tablewrap"><table><thead><tr><th>Customer ka naam</th><th>Mobile</th><th>Bill number</th><th>Bill ki date</th><th>Rakam</th><th>Forwarded by</th></tr></thead><tbody>'+dayBills.map(b=>{const l=leads.find(x=>x.id===b.lead_id);return '<tr><td class="name">'+esc(l?.customer_name||'Customer')+'</td><td>'+esc(l?.customer_phone||'—')+'</td><td>'+esc(b.bill_number)+'</td><td>'+dt(b.bill_date,true)+'</td><td><b>'+money(b.amount_inr)+'</b></td><td>Sohail · Social Media Manager</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">Selected date par koi bill record nahi hua.</div>')+'</section>';
+      document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>saveRepairUpdate(b.dataset.save));
+      document.querySelectorAll('[data-bill]').forEach(b=>b.onclick=()=>showBillModal(b.dataset.bill));
+    }
+    async function saveLead(e){
+      e.preventDefault();const f=new FormData(e.currentTarget),phone=String(f.get('customer_phone')||'').trim();
+      if(phone.replace(/\D/g,'').length<10){alertBox('Sahi mobile number daalein — kam se kam 10 digits.',true);return}
+      const payload={customer_name:String(f.get('customer_name')||'').trim(),customer_phone:phone,source:f.get('source'),destination:f.get('destination'),forwarded_by:C.user.id,created_by:C.user.id,forwarded_to:String(f.get('forwarded_to')||'').trim()||null,status:'forwarded',notes:String(f.get('notes')||'').trim()||null,follow_up_at:f.get('follow_up_at')?new Date(f.get('follow_up_at')).toISOString():null};
+      try{
+        const created=await C.request('/rest/v1/crm_leads',{method:'POST',body:payload,extra:{Prefer:'return=representation'}});
+        const lead=Array.isArray(created)?created[0]:created;
+        await C.request('/rest/v1/crm_interactions',{method:'POST',body:{lead_id:lead.id,interaction_type:'inquiry',channel:payload.source,summary:'Initial customer enquiry received and forwarded by Sohail.',created_by:C.user.id},extra:{Prefer:'return=minimal'}});
+        alertBox('Customer save aur forward ho gaya. Boss aur assigned team ko update dikh raha hai.');await loadData();
+      }catch(err){alertBox('CRM entry save nahi hui: '+err.message,true)}
+    }
+    async function saveRepairUpdate(id){
+      const status=$('[data-status="'+CSS.escape(id)+'"]').value,note=$('[data-note="'+CSS.escape(id)+'"]').value.trim(),lead=leads.find(l=>l.id===id);
+      try{
+        await C.request('/rest/v1/crm_leads?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:{status,response_received_at:lead.response_received_at||new Date().toISOString(),response_note:note||null,updated_at:new Date().toISOString()},extra:{Prefer:'return=minimal'}});
+        await C.request('/rest/v1/crm_interactions',{method:'POST',body:{lead_id:id,interaction_type:'response',channel:lead.source,summary:note||('Service Center status updated: '+(statusLabels[status]||status)),created_by:C.user.id},extra:{Prefer:'return=minimal'}});
+        alertBox('Service Center update save ho gaya. Sohail aur Boss ko response dikh jayega.');await loadData();
+      }catch(err){alertBox('Case update nahi hua: '+err.message,true)}
+    }
+    function showBillModal(id){
+      const l=leads.find(x=>x.id===id);if(!l)return;
+      $('#modal').innerHTML='<div class="modalback" role="presentation"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="billTitle"><h2 id="billTitle">Service Center bill record karein</h2><p>'+esc(l.customer_name)+' · '+esc(l.customer_phone)+' · Case '+esc(l.id.slice(0,8).toUpperCase())+'</p><form id="billForm"><input type="hidden" name="lead_id" value="'+esc(id)+'"><div class="field"><label>Bill number</label><input name="bill_number" maxlength="80" required placeholder="Bill / receipt number"></div><div class="field" style="margin-top:12px"><label>Bill ki date</label><input name="bill_date" type="date" value="'+today()+'" required></div><div class="field" style="margin-top:12px"><label>Rakam (₹)</label><input name="amount_inr" type="number" min="0" step="0.01" required placeholder="0.00"></div><div class="modalfoot"><button class="btn ghost" type="button" id="cancelBill">Cancel</button><button class="btn primary" type="submit">Bill save karein</button></div></form></section></div>';
+      $('#cancelBill').onclick=()=>$('#modal').innerHTML='';$('#billForm').onsubmit=saveBill;
+    }
+    async function saveBill(e){
+      e.preventDefault();const f=new FormData(e.currentTarget),id=f.get('lead_id');
+      try{
+        await C.request('/rest/v1/crm_bills',{method:'POST',body:{lead_id:id,bill_number:String(f.get('bill_number')).trim(),bill_date:f.get('bill_date'),amount_inr:Number(f.get('amount_inr')),created_by:C.user.id},extra:{Prefer:'return=minimal'}});
+        await C.request('/rest/v1/crm_leads?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:{status:'bill_created',response_received_at:new Date().toISOString(),updated_at:new Date().toISOString()},extra:{Prefer:'return=minimal'}});
+        await C.request('/rest/v1/crm_interactions',{method:'POST',body:{lead_id:id,interaction_type:'response',channel:leads.find(l=>l.id===id)?.source||'normal_call',summary:'Service Center bill recorded.',created_by:C.user.id},extra:{Prefer:'return=minimal'}});
+        $('#modal').innerHTML='';alertBox('Bill isi customer aur case ke saath save ho gaya.');await loadData();
+      }catch(err){alertBox('Bill save nahi hua: '+err.message,true)}
+    }
+    function alertBox(text,error=false){let el=$('#notice');if(!el){el=document.createElement('div');el.id='notice';el.className='alert';app.prepend(el)}el.className='alert'+(error?' error':'');el.textContent=text;window.setTimeout(()=>{if(el.isLive connected)el.remove()},5000)}
+    async function loadData(){
+      try{
+        $('#refreshStatus').textContent='Update ho raha hai…';
+        const [a,b,c]=await Promise.all([
+          C.request('/rest/v1/crm_leads?select=*&order=created_at.desc&limit=1000'),
+          C.request('/rest/v1/crm_interactions?select=*&order=created_at.desc&limit=3000'),
+          C.request('/rest/v1/crm_bills?select=*&order=created_at.desc&limit=1000')
+        ]);
+        leads=Array.isArray(a)?a:[];interactions=Array.isArray(b)?b:[];bills=Array.isArray(c)?c:[];
+        $('#refreshStatus').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'});
+        render();
+      }catch(err){$('#refreshStatus').textContent='Sync issue';alertBox('CRM data refresh nahi hua: '+err.message,true)}
+    }
+    function showLogin(){
+      role='';$('#signOut').classList.add('hide');nav.innerHTML='';$('#crumb').textContent='Secure login';$('#userRole').textContent='Authorized staff only';$('#userName').childNodes[0].textContent='Galaxy Point';
+      app.innerHTML='<div class="loginwrap"><section class="panel login"><h1>Galaxy Point CRM</h1><p>Apne staff account se sign in karein. Access aapke assigned CRM role ke hisaab se milega.</p><div id="loginAlert"></div><form id="loginForm"><div class="field"><label>EMAIL</label><input type="email" name="email" required autocomplete="username"></div><div class="field"><label>PASSWORD</label><input type="password" name="password" required autocomplete="current-password"></div><button class="btn primary" style="width:100%;margin-top:6px">Secure sign in</button></form></section></div>';
+      $('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{const p=await C.signIn(f.get('email'),f.get('password'));role=p?.role||C.role;if(!['boss','social_media_manager','service_center'].includes(role))throw Error('Is account ko CRM role abhi assign nahi hai. Boss se Social Media Manager ya Service Center access assign karwayein.');screen=role==='boss'?'boss':role==='service_center'?'repair':'manager';await loadData()}catch(err){$('#loginAlert').innerHTML='<div class="alert error">'+esc(err.message)+'</div>'}};
+    }
+    async function boot(){
+      try{if(C.configured()){const p=await C.ensureSession();if(p?.role&&['boss','social_media_manager','service_center'].includes(p.role)){role=p.role;screen=role==='boss'?'boss':role==='service_center'?'repair':'manager';$('#signOut').classList.remove('hide');await loadData();return}}}
+      catch(e){/* An expired or unauthorized session returns to the secure sign-in form. */}
+      showLogin();
+    }
+    $('#signOut').onclick=async()=>{await C.signOut();location.reload()};
+    boot();window.setInterval(()=>{if(C.active()&&!document.hidden)loadData()},20000);
+  })();
+  </script>
+</body>
+</html>
+
