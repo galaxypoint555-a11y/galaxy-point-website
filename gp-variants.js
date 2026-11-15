@@ -49,7 +49,18 @@ function mountEditor(form,product){
  }
  function discount(card){const p=Number(card.querySelector('[data-k="price"]').value),m=Number(card.querySelector('[data-k="marketPrice"]').value);card.querySelector('[data-discount]').textContent=m>p&&p>=0?Math.round((m-p)/m*100)+'% OFF':'—';}
  host.addEventListener('input',e=>{const card=e.target.closest('[data-unit]');if(card){if(e.target.matches('[data-k="price"]'))lastEditedUnit=Number(card.dataset.unit);discount(card)}});
- host.addEventListener('change',e=>{if(e.target.matches('[data-choice]')){capture();draw()}});
+ host.addEventListener('change',e=>{if(e.target.matches('[data-choice]')){
+   const changedType=e.target.dataset.choice,changedValue=e.target.value,checked=e.target.checked;
+   capture();
+   if(checked&&rows.length){
+    // Auto-fill the first unassigned unit as soon as staff chooses storage/colour.
+    const field=changedType==='storage'?'storage':'color';
+    if(!rows[0][field]||!((field==='storage'?storages:colors).includes(rows[0][field]))){
+      rows[0][field]=changedValue;
+    }
+   }
+   draw();
+  }});
  host.addEventListener('click',e=>{
   if(e.target.id==='gp-add-color'){const v=host.querySelector('#gp-custom-color').value.trim();if(v){capture();colors=[...new Set([...colors,v])];draw()}}
   if(e.target.id==='gp-add-unit'){capture();rows.push({storage:storages[0]||rows[0]?.storage||'',color:colors[0]||rows[0]?.color||'',price:'',marketPrice:'',stock:1,batteryHealth:'',cycleCount:''});draw()}
