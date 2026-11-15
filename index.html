@@ -386,6 +386,7 @@ function gpFiltered(){const matched=items.filter(p=>{if(window.gpSelectedIphoneS
     if(/pro[\\s-]*max/.test(name))return 0;
     if(/\\bpro\\b/.test(name))return 1;
     if(/\\bair\\b/.test(name))return 2;
+    if(window.gpSelectedIphoneSeries===17)return 3;
     if(/\\bplus\\b/.test(name))return 3;
     if(/\\bmini\\b/.test(name))return 4;
     return 5;
