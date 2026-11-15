@@ -294,14 +294,7 @@ html.gp-app-first-open-locked,html.gp-app-first-open-locked body{overflow:hidden
 <main id="view"></main><button class="chat" id="chatBtn" aria-label="Store contact">☏</button>
 <script src="gp-config.js?v=20261110-mobile-live-2"></script><script src="gp-first-open.js?v=20261113-skip-white-screen-fix-1"></script><script src="gp-variants.js?v=20261114-region-selector-1"></script><script>
 (function(){
-let items=[
-{id:1,name:"iPhone 17 Pro Max",brand:"APPLE",details:"Premium collection • Storage on enquiry",price:null,category:"iPhone",stock:3},
-{id:2,name:"iPhone 16 Pro Max",brand:"APPLE",details:"Premium collection • Storage on enquiry",price:null,category:"iPhone",stock:3},
-{id:3,name:"Samsung Galaxy Z Fold 5",brand:"SAMSUNG",details:"Fold series • Condition on enquiry",price:null,category:"Samsung",stock:2},
-{id:4,name:"Samsung Galaxy S25 Edge",brand:"SAMSUNG",details:"Premium Galaxy series",price:null,category:"Samsung",stock:2},
-{id:5,name:"MacBook Neo",brand:"APPLE",details:"Premium laptop • Configuration on enquiry",price:null,category:"Laptops",stock:1},
-{id:6,name:"iPhone 16",brand:"APPLE",details:"Premium collection • Storage on enquiry",price:null,category:"iPhone",stock:2}
-];let page="home",cat="All",bag={},orders=[];const v=document.getElementById("view"),money=n=>n==null?"Price on request":"₹"+n.toLocaleString("en-IN");
+let items=[]let page="home",cat="All",bag={},orders=[];const v=document.getElementById("view"),money=n=>n==null?"Price on request":"₹"+n.toLocaleString("en-IN");
 // Preload catalog images ahead of scrolling; browser cache reuses decoded assets.
 const gpPhotoPreloaded=new Set();
 function gpWarmProductPhotos(){
@@ -516,7 +509,7 @@ document.addEventListener("change",function(e){if(e.target.id==="gpReceiveMethod
 document.addEventListener("submit",function(e){if(e.target.id==="checkoutForm"){e.preventDefault();const f=new FormData(e.target);const id="GP-DEMO-"+Math.floor(1000+Math.random()*9000);orders.push({id,name:String(f.get("name")).slice(0,70),total:sum()});bag={};page="track";show();document.getElementById("trackResult").innerHTML='<div class="callout"><strong>Demo order created:</strong> '+id+'<br>No real order was submitted. Enter the ID above to try order tracking.</div>'}else if(e.target.id==="trackForm"){e.preventDefault();const f=new FormData(e.target),id=String(f.get("id")).trim().toUpperCase(),o=orders.find(x=>x.id===id);document.getElementById("trackResult").innerHTML=o?'<div class="callout"><strong>'+o.id+'</strong><br>Status: Demo Pending<br>Amount: '+money(o.total)+'</div>':'<div class="callout">No matching demo order in this browser session.</div>'}});
 // Start with the last published hero video before the first page render.
 window.gpPublishedSettings={...(window.gpPublishedSettings||{}),hero_video_url:'https://deabamjmlvcrpqijsjmc.supabase.co/storage/v1/object/public/gp-site-media/videos/0f63e563-0713-4897-ba70-c7798ebb7771.mp4'};window.gpVideoSettingsLoaded=true;
-show();
+// Do not render sample inventory before live catalog loads.
 
 // Public catalog synchronization: reads only published active inventory.
 // No customer credentials, staff permissions, or payment features are used.
