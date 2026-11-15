@@ -52,17 +52,21 @@ create table if not exists public.crm_bills (
 create index if not exists crm_leads_created_at_idx on public.crm_leads (created_at desc);
 create index if not exists crm_leads_destination_status_idx on public.crm_leads (destination, status, created_at desc);
 create index if not exists crm_leads_creator_idx on public.crm_leads (created_by, created_at desc);
+create index if not exists crm_leads_forwarder_idx on public.crm_leads (forwarded_by);
 create index if not exists crm_interactions_lead_created_idx on public.crm_interactions (lead_id, created_at desc);
 create index if not exists crm_interactions_channel_created_idx on public.crm_interactions (channel, created_at desc);
+create index if not exists crm_interactions_creator_idx on public.crm_interactions (created_by);
 create index if not exists crm_bills_lead_date_idx on public.crm_bills (lead_id, bill_date desc);
+create index if not exists crm_bills_creator_idx on public.crm_bills (created_by);
 
 alter table public.crm_leads enable row level security;
 alter table public.crm_interactions enable row level security;
 alter table public.crm_bills enable row level security;
 
+revoke all on public.crm_leads, public.crm_interactions, public.crm_bills from public;
 revoke all on public.crm_leads, public.crm_interactions, public.crm_bills from anon;
+revoke all on public.crm_leads, public.crm_interactions, public.crm_bills from authenticated;
 grant select, insert on public.crm_leads, public.crm_interactions, public.crm_bills to authenticated;
-revoke update on public.crm_leads, public.crm_interactions, public.crm_bills from authenticated;
 grant update (status, response_received_at, response_note, follow_up_at, notes, forwarded_to, updated_at)
   on public.crm_leads to authenticated;
 
