@@ -1,12 +1,24 @@
-/* Galaxy Point public browser configuration. Only the Supabase publishable/anon key belongs here. NEVER add service_role keys, payment secrets or passwords. */
+/* Galaxy Point public browser configuration (Firebase + Cloudinary). */
 window.GP_CONFIG = {
   brand: "Galaxy Point",
   location: "Shop No. 49, Tiara Mall, Sector 13, Kharghar, Navi Mumbai",
   instagram: "https://www.instagram.com/galaxy_pointt26/",
   youtube: "https://www.youtube.com/@Galaxy_Pointt",
   whatsappNumber: "",
-  supabaseUrl: "https://deabamjmlvcrpqijsjmc.supabase.co",
-  supabaseAnonKey: "sb_publishable_HS5moaQzPaUKX3tgBzlDRg_c4SaUqDb",
+  firebase: {
+    apiKey: "AIzaSyCta-ikLWXfIlX-ZGynoSuH_X56Poh02Hg",
+    authDomain: "galaxy-point-website.firebaseapp.com",
+    projectId: "galaxy-point-website",
+    storageBucket: "galaxy-point-website.firebasestorage.app",
+    messagingSenderId: "67617881123",
+    appId: "1:67617881123:web:29c17f7a027dd2e9dec596",
+    measurementId: "G-Q563R3Z5EL"
+  },
+  cloudinary: {
+    cloudName: "kla5zs3v",
+    uploadPreset: "galaxy_point"
+  },
+  bossEmails: ["jagdish@gmail.com"],
   turnstileSiteKey: "",
   onlinePaymentsEnabled: false,
   deliveryEnabled: false,
