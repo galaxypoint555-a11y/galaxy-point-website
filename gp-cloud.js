@@ -1,103 +1,310 @@
-/* Shared Galaxy Point Supabase client for Website Editor and Boss Dashboard.
-   Public configuration is loaded from gp-config.js. Never place server-side keys here. */
-window.GPCloud=(()=>{
-  const cfg=window.GP_CONFIG||{}, storageKey='gp_secure_staff_session_v1';
-  let session=null,user=null,role=null;
-  const configured=()=>Boolean(/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(cfg.supabaseUrl||'')&&cfg.supabaseAnonKey);
-  function requireConfig(){if(!configured())throw Error('Cloud database is not configured. Set the Supabase Project URL and publishable key in gp-config.js.');}
-  const base=()=>{requireConfig();return cfg.supabaseUrl.replace(/\/$/,'');};
-  function headers(auth=true,extra={}){const h={apikey:cfg.supabaseAnonKey,'Content-Type':'application/json',...extra};h.Authorization='Bearer '+(auth&&session?.access_token?session.access_token:cfg.supabaseAnonKey);return h;}
-  let refreshPromise=null;
-  async function renewSession(){
-    if(!session?.refresh_token)throw Error('Session expired. Please sign in again.');
-    if(!refreshPromise)refreshPromise=(async()=>{
-      const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:headers(false),body:JSON.stringify({refresh_token:session.refresh_token})});
-      const data=await res.json().catch(()=>({}));
-      if(!res.ok||!data.access_token)throw Error('Session expired. Please sign in again.');
-      saveSession({...data,expires_at:Math.floor(Date.now()/1000)+data.expires_in});
-    })().finally(()=>{refreshPromise=null});
-    return refreshPromise;
+/* Shared Galaxy Point Firebase + Cloudinary client for Website Editor and Boss Dashboard. */
+window.GPCloud = (() => {
+  const cfg = window.GP_CONFIG || {}, storageKey = 'gp_fb_staff_session_v1';
+  let session = null, user = null, role = null;
+
+  const fb = () => cfg.firebase || {};
+  const cld = () => cfg.cloudinary || {};
+  const configured = () => Boolean(fb().apiKey && fb().projectId && cld().cloudName && cld().uploadPreset);
+
+  function requireConfig() {
+    if (!configured()) throw Error('Firebase or Cloudinary is not configured in gp-config.js.');
   }
-  async function request(path,{method='GET',body,auth=true,extra={},raw=false}={}){
-    const isAuthEndpoint=path.startsWith('/auth/v1/token');
-    if(auth&&!isAuthEndpoint&&session?.access_token&&session.expires_at&&session.expires_at<=Math.floor(Date.now()/1000)+120){
-      try{await renewSession()}catch(e){saveSession(null);throw e}
+
+  const fsBase = () => `https://firestore.googleapis.com/v1/projects/${fb().projectId}/databases/(default)/documents`;
+
+  function toFsVal(v) {
+    if (v === null || v === undefined) return { nullValue: null };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (typeof v === 'string') return { stringValue: v };
+    if (Array.isArray(v)) return { arrayValue: { values: v.map(toFsVal) } };
+    if (typeof v === 'object') {
+      const fields = {};
+      for (const [k, val] of Object.entries(v)) {
+        if (val !== undefined) fields[k] = toFsVal(val);
+      }
+      return { mapValue: { fields } };
     }
-    const send=()=>fetch(base()+path,{method,headers:headers(auth,extra),body:body===undefined?undefined:(raw?body:JSON.stringify(body))});
-    let res=await send();
-    // Supabase/PostgREST can reject an expired JWT with 400/403 as well as 401.
-    // Inspect the error body, refresh once, and retry the original request without
-    // discarding the editor form or asking staff to re-enter product information.
-    let txt=await res.text();let data=null;try{data=txt?JSON.parse(txt):null;}catch{data=txt;}
-    const authError=()=>/exp.*claim.*timestamp|jwt.*expir|token.*expir|invalid.*jwt/i.test(
-      [data?.message,data?.error_description,data?.msg,data?.error,typeof data==='string'?data:''].filter(Boolean).join(' '));
-    if(auth&&!isAuthEndpoint&&session?.refresh_token&&!res.ok&&(res.status===401||authError())){
-      try{
-        await renewSession();
-        res=await send();
-        txt=await res.text();
-        try{data=txt?JSON.parse(txt):null;}catch{data=txt;}
-      }catch(e){throw Error('Session renewal failed. Please sign in again without closing this product form. '+e.message)}
+    return { stringValue: String(v) };
+  }
+
+  function fromFsVal(v) {
+    if (!v || typeof v !== 'object') return null;
+    if ('nullValue' in v) return null;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('integerValue' in v) return Number(v.integerValue);
+    if ('doubleValue' in v) return Number(v.doubleValue);
+    if ('stringValue' in v) return v.stringValue;
+    if ('timestampValue' in v) return v.timestampValue;
+    if ('arrayValue' in v) return (v.arrayValue.values || []).map(fromFsVal);
+    if ('mapValue' in v) {
+      const obj = {};
+      for (const [k, val] of Object.entries(v.mapValue.fields || {})) obj[k] = fromFsVal(val);
+      return obj;
     }
-    if(!res.ok)throw Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+res.status+')');
+    return null;
+  }
+
+  function fromDoc(doc) {
+    const id = doc.name.split('/').pop();
+    const data = fromFsVal({ mapValue: { fields: doc.fields || {} } }) || {};
+    return { id, ...data, created_at: data.created_at || doc.createTime || new Date().toISOString() };
+  }
+
+  function saveSession(s) {
+    session = s;
+    if (s) sessionStorage.setItem(storageKey, JSON.stringify(s));
+    else sessionStorage.removeItem(storageKey);
+  }
+
+  async function renewSession() {
+    if (!session?.refreshToken) throw Error('Session expired. Please sign in again.');
+    const res = await fetch(`https://securetoken.googleapis.com/v1/token?key=${fb().apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grant_type: 'refresh_token', refresh_token: session.refreshToken })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.id_token) throw Error('Session expired. Please sign in again.');
+    saveSession({
+      idToken: data.id_token,
+      refreshToken: data.refresh_token,
+      email: session.email,
+      uid: data.user_id,
+      expiresAt: Date.now() + (Number(data.expires_in || 3600) * 1000)
+    });
+  }
+
+  async function getToken() {
+    if (!session) {
+      try { session = JSON.parse(sessionStorage.getItem(storageKey) || 'null'); } catch {}
+    }
+    if (!session?.idToken) return null;
+    if (session.expiresAt && session.expiresAt <= Date.now() + 90000) {
+      await renewSession();
+    }
+    return session.idToken;
+  }
+
+  async function fsReq(path, { method = 'GET', body, auth = true } = {}) {
+    requireConfig();
+    const token = auth ? await getToken() : null;
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = 'Bearer ' + token;
+    const res = await fetch(fsBase() + path, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Error(data?.error?.message || 'Database request failed (' + res.status + ')');
     return data;
   }
-  function q(s){return encodeURIComponent(String(s));}
-  function saveSession(s){session=s;if(s)sessionStorage.setItem(storageKey,JSON.stringify(s));else sessionStorage.removeItem(storageKey);}
-  async function ensureSession(){
-    if(!session){try{session=JSON.parse(sessionStorage.getItem(storageKey)||'null');}catch{}}
-    if(!session?.access_token)return null;
-    if(session.expires_at&&session.expires_at<=Math.floor(Date.now()/1000)+90){
-      try{const renew=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token},auth:false});
-        saveSession({...renew,expires_at:Math.floor(Date.now()/1000)+renew.expires_in});}
-      catch{saveSession(null);user=null;role=null;return null;}
-    }
-    try{
-      user=await request('/auth/v1/user');
-      const rows=await request('/rest/v1/staff_profiles?select=user_id,role&user_id=eq.'+q(user.id));
-      if(!Array.isArray(rows)||!rows.length)throw Error('Your account does not have Galaxy Point staff access.');
-      role=rows[0].role;return {user,role};
-    }catch(e){saveSession(null);user=null;role=null;throw e;}
+
+  async function ensureSession() {
+    const token = await getToken();
+    if (!token) return null;
+    user = { id: session.uid, email: session.email };
+    const bossList = (cfg.bossEmails || ['jagdish@gmail.com']).map(e => e.toLowerCase());
+    role = bossList.includes(String(session.email || '').toLowerCase()) ? 'boss' : 'staff';
+    return { user, role };
   }
-  async function signIn(email,password){
+
+  async function signIn(email, password) {
     requireConfig();
-    const a=await request('/auth/v1/token?grant_type=password',{method:'POST',auth:false,body:{email,password}});
-    saveSession({...a,expires_at:Math.floor(Date.now()/1000)+a.expires_in});
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${fb().apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: String(email).trim(), password, returnSecureToken: true })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.idToken) {
+      const msg = data?.error?.message || 'Invalid email or password';
+      throw Error(msg.replace(/_/g, ' '));
+    }
+    saveSession({
+      idToken: data.idToken,
+      refreshToken: data.refreshToken,
+      email: data.email,
+      uid: data.localId,
+      expiresAt: Date.now() + (Number(data.expiresIn || 3600) * 1000)
+    });
     return ensureSession();
   }
-  async function signOut(){
-    if(session)try{await request('/auth/v1/logout',{method:'POST'});}catch{}
-    saveSession(null);role=null;user=null;
+
+  async function signOut() {
+    saveSession(null);
+    user = null;
+    role = null;
   }
-  function active(){return Boolean(session?.access_token&&user&&role);}
-  function guard(){if(!active())throw Error('Sign in with an authorized staff account first.');}
-  async function productById(id){guard();return request('/rest/v1/products?select=*&id=eq.'+q(id)+'&limit=1');}
-  async function products(){guard();const rows=await request('/rest/v1/products?select=*&order=created_at.desc&limit=500');return rows.map(p=>({...p,name:p.title,price:p.price_inr,condition:p.condition||'Pre-owned',is_published:p.is_published??p.active??false}));}
-  async function settings(){guard();const rows=await request('/rest/v1/website_settings?select=key,value');return Object.fromEntries(rows.map(x=>[x.key,x.value]));}
-  async function saveSettings(fields){guard();return request('/rest/v1/website_settings?on_conflict=key',{method:'POST',body:Object.entries(fields).map(([key,value])=>({key,value})),extra:{Prefer:'resolution=merge-duplicates,return=minimal'}});}
-  async function upsertProduct(fields,id){
+
+  function active() { return Boolean(session?.idToken && user && role); }
+  function guard() { if (!active()) throw Error('Sign in with an authorized staff account first.'); }
+
+  async function listCollection(col, auth = true) {
+    const data = await fsReq(`/${col}?pageSize=500`, { auth });
+    const docs = (data.documents || []).map(fromDoc);
+    return docs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  }
+
+  async function productById(id) {
     guard();
-    const category=String(fields.category||'').toLowerCase(); const title=String(fields.title||'').toLowerCase(); const brand=fields.brand||(/iphone|ipad|macbook|apple watch/.test(category+' '+title)?'Apple':/samsung|galaxy/.test(category+' '+title)?'Samsung':/oneplus/.test(category+' '+title)?'OnePlus':/pixel|google/.test(category+' '+title)?'Google':/nothing/.test(category+' '+title)?'Nothing':/motorola|moto/.test(category+' '+title)?'Motorola':/vivo/.test(category+' '+title)?'Vivo':/oppo/.test(category+' '+title)?'Oppo':null); if(!brand)throw new Error('Brand is required. Please include a recognised brand in the product name.'); const data={title:fields.title,brand,category:fields.category,variant:fields.variant,description:fields.description,price_inr:fields.price_inr,stock:fields.stock,variant_options:fields.variant_options||[],image_url:fields.image_url,is_published:fields.active,active:fields.active};
-    if(id){const updated=await request('/rest/v1/products?id=eq.'+q(id),{method:'PATCH',body:data,extra:{Prefer:'return=representation'}});if(!Array.isArray(updated)||updated.length!==1)throw Error('Product update was not applied in Supabase. Check staff update permissions (RLS) and product ID.');if(Number(updated[0].price_inr)!==Number(data.price_inr))throw Error('Supabase returned an unexpected price after save.');return updated;}
-    const slug=(String(fields.title||'product').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,65)||'product')+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
-    return request('/rest/v1/products',{method:'POST',body:{...data,slug,condition:fields.condition||'Pre-owned'},extra:{Prefer:'return=representation'}});
+    const doc = await fsReq(`/products/${encodeURIComponent(id)}`);
+    return [fromDoc(doc)];
   }
-  async function removeProduct(id){guard();return request('/rest/v1/products?id=eq.'+q(id),{method:'DELETE',extra:{Prefer:'return=minimal'}});}
-  async function orders(){guard();return request('/rest/v1/orders?select=*,order_items(*)&payment_status=eq.Paid&order=created_at.desc&limit=500');}
-  async function updateOrderStatus(id,status){guard();return request('/rest/v1/orders?id=eq.'+q(id),{method:'PATCH',body:{fulfillment_status:status},extra:{Prefer:'return=minimal'}});}
-  async function upload(file,folder='catalog'){
-    guard();if(!file||!file.size)throw Error('Choose an image or video first.');
-    if(!['image/jpeg','image/png','image/webp','video/mp4','video/webm'].includes(file.type))throw Error('Upload JPG, PNG, WebP, MP4 or WebM only.');
-    if(file.size>30*1024*1024)throw Error('File is larger than 30 MB. Please compress it before uploading.');
-    if(!['catalog','banners','videos'].includes(folder))throw Error('Invalid media folder');
-    const ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm'}[file.type];
-    const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));
-    const path=folder+'/'+id+'.'+ext;
-    const res=await fetch(base()+'/storage/v1/object/gp-site-media/'+path,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+session.access_token,'Content-Type':file.type,'x-upsert':'false'},body:file});
-    if(!res.ok){const d=await res.json().catch(()=>({}));throw Error(d.message||d.error||'Media upload failed. Check gp-site-media Storage bucket policies.');}
-    return base()+'/storage/v1/object/public/gp-site-media/'+path;
+
+  async function products() {
+    guard();
+    const rows = await listCollection('products');
+    return rows.map(p => ({
+      ...p,
+      name: p.title,
+      price: p.price_inr,
+      condition: p.condition || 'Pre-Owned',
+      is_published: p.is_published ?? p.active ?? false
+    }));
   }
-  function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});}
-  function clean(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-  return{cfg,configured,request,ensureSession,signIn,signOut,active,products,productById,settings,saveSettings,upsertProduct,removeProduct,orders,updateOrderStatus,upload,money,clean,get user(){return user;},get role(){return role;}};
+
+  async function settings() {
+    const data = await fsReq('/website_settings?pageSize=200', { auth: false });
+    const out = {};
+    for (const doc of (data.documents || [])) {
+      const d = fromDoc(doc);
+      out[d.id] = d.value;
+    }
+    return out;
+  }
+
+  async function saveSettings(fields) {
+    guard();
+    for (const [key, value] of Object.entries(fields)) {
+      await fsReq(`/website_settings/${encodeURIComponent(key)}`, {
+        method: 'PATCH',
+        body: { fields: { value: toFsVal(value), updated_at: toFsVal(new Date().toISOString()) } }
+      });
+    }
+  }
+
+  async function upsertProduct(fields, id) {
+    guard();
+    const category = String(fields.category || '').toLowerCase();
+    const title = String(fields.title || '').toLowerCase();
+    const brand = fields.brand || (
+      /iphone|ipad|macbook|apple watch/.test(category + ' ' + title) ? 'Apple' :
+      /samsung|galaxy/.test(category + ' ' + title) ? 'Samsung' :
+      /oneplus/.test(category + ' ' + title) ? 'OnePlus' :
+      /pixel|google/.test(category + ' ' + title) ? 'Google' :
+      /nothing/.test(category + ' ' + title) ? 'Nothing' :
+      /motorola|moto/.test(category + ' ' + title) ? 'Motorola' :
+      /vivo/.test(category + ' ' + title) ? 'Vivo' :
+      /oppo/.test(category + ' ' + title) ? 'Oppo' : 'Galaxy Point'
+    );
+
+    const docId = id || ('prod_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6));
+    const payload = {
+      title: fields.title,
+      brand,
+      category: fields.category,
+      variant: fields.variant || '',
+      description: fields.description || '',
+      price_inr: Number(fields.price_inr || 0),
+      stock: Number(fields.stock || 0),
+      variant_options: fields.variant_options || [],
+      image_url: fields.image_url || null,
+      is_published: Boolean(fields.active),
+      active: Boolean(fields.active),
+      condition: fields.condition || 'Pre-Owned',
+      created_at: fields.created_at || new Date().toISOString()
+    };
+
+    const fsFields = {};
+    for (const [k, v] of Object.entries(payload)) fsFields[k] = toFsVal(v);
+    const saved = await fsReq(`/products/${encodeURIComponent(docId)}`, {
+      method: 'PATCH',
+      body: { fields: fsFields }
+    });
+    return [fromDoc(saved)];
+  }
+
+  async function removeProduct(id) {
+    guard();
+    return fsReq(`/products/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  }
+
+  async function compressImage(file) {
+    if (!file.type.startsWith('image/')) return file;
+    return new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const max = 1400;
+        let { width, height } = img;
+        if (width > max || height > max) {
+          if (width > height) { height = Math.round(height * max / width); width = max; }
+          else { width = Math.round(width * max / height); height = max; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => resolve(blob || file), 'image/webp', 0.84);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
+
+  async function upload(file, folder = 'catalog') {
+    guard();
+    if (!file || !file.size) throw Error('Choose an image or video first.');
+    if (!['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'].includes(file.type)) {
+      throw Error('Upload JPG, PNG, WebP, MP4 or WebM only.');
+    }
+    const isVideo = file.type.startsWith('video/');
+    const uploadBlob = isVideo ? file : await compressImage(file);
+    const formData = new FormData();
+    formData.append('file', uploadBlob);
+    formData.append('upload_preset', cld().uploadPreset);
+    formData.append('folder', 'galaxy_point/' + folder);
+
+    const endpoint = `https://api.cloudinary.com/v1_1/${cld().cloudName}/${isVideo ? 'video' : 'image'}/upload`;
+    const res = await fetch(endpoint, { method: 'POST', body: formData });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.secure_url) {
+      throw Error(data?.error?.message || 'Cloudinary upload failed. Check preset "galaxy_point" is Unsigned.');
+    }
+    return data.secure_url;
+  }
+
+  async function listPublic(col) { return listCollection(col, false); }
+  async function addPublicDoc(col, obj) {
+    const id = 'doc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    const fsFields = {};
+    for (const [k, v] of Object.entries({ ...obj, created_at: new Date().toISOString() })) {
+      fsFields[k] = toFsVal(v);
+    }
+    return fsReq(`/${col}/${id}`, { method: 'PATCH', body: { fields: fsFields }, auth: false });
+  }
+  async function deleteDoc(col, id) {
+    guard();
+    return fsReq(`/${col}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  }
+  async function patchDoc(col, id, fields) {
+    guard();
+    const fsFields = {};
+    for (const [k, v] of Object.entries(fields)) fsFields[k] = toFsVal(v);
+    const keys = Object.keys(fields).map(k => 'updateMask.fieldPaths=' + encodeURIComponent(k)).join('&');
+    return fsReq(`/${col}/${encodeURIComponent(id)}?${keys}`, { method: 'PATCH', body: { fields: fsFields } });
+  }
+
+  function money(n) { return '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }); }
+  function clean(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  return {
+    cfg, configured, ensureSession, signIn, signOut, active,
+    products, productById, settings, saveSettings, upsertProduct, removeProduct,
+    upload, listCollection, listPublic, addPublicDoc, deleteDoc, patchDoc,
+    money, clean, get user() { return user; }, get role() { return role; }
+  };
 })();
